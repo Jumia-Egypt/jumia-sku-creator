@@ -1,0 +1,914 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jumia SKU Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--orange:#f68b1e;--orangeDark:#e07000;--orangeSoft:#fff5ea;--grad:linear-gradient(135deg,#ffa53d,#f68b1e 55%,#e07000);
+--bg:#f6f7f9;--card:#fff;--text:#1f2430;--dim:#6b7280;--border:#e8eaed;--r:16px;
+--danger:#e5484d;--green:#16a34a;
+--sh:0 1px 2px rgba(16,24,40,.04),0 6px 18px rgba(16,24,40,.05);--shHover:0 8px 28px rgba(246,139,30,.16);
+--font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#fff3e6,rgba(255,243,230,0) 60%),var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+.logo{font-weight:800;font-size:25px;letter-spacing:-.6px}.star{color:var(--orange);font-size:20px;margin-left:2px}
+.demoTag{background:#fde8e8;color:#b42318;border:1px solid #f3b9b9;font-weight:700;font-size:11px;padding:5px 10px;border-radius:8px}
+.wrap{max-width:1100px;margin:0 auto;padding:30px 26px 80px}
+.banner{background:#fff4e6;border:1px solid #ffd9ad;color:#8a4b00;border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;margin-bottom:18px}
+.hero{display:flex;align-items:center;gap:18px;padding:26px 28px;margin-bottom:18px;border-radius:var(--r);color:#fff;background:var(--grad);box-shadow:0 12px 30px rgba(246,139,30,.32);position:relative;overflow:hidden;animation:cardReveal .5s cubic-bezier(.2,.7,.2,1) both}
+.hero::after{content:"";position:absolute;right:-40px;top:-60px;width:200px;height:200px;background:rgba(255,255,255,.14);border-radius:50%}
+.hero::before{content:"";position:absolute;right:60px;bottom:-80px;width:160px;height:160px;background:rgba(255,255,255,.1);border-radius:50%}
+.hero-emoji{font-size:34px;background:rgba(255,255,255,.2);width:62px;height:62px;border-radius:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;backdrop-filter:blur(4px)}
+.hero-title{font-size:28px;font-weight:800;letter-spacing:-.4px;line-height:1.12}
+.hero-title span{font-weight:800;text-decoration:underline;text-decoration-color:rgba(255,255,255,.55);text-underline-offset:4px}
+.hero-sub{font-size:14px;opacity:.92;margin-top:5px;font-weight:500}
+@media(max-width:600px){.hero{padding:20px 18px;gap:12px;flex-direction:column;align-items:flex-start}.hero-emoji{width:48px;height:48px;font-size:26px}.hero-title{font-size:22px}.hero-sub{font-size:13px}}
+.card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);padding:22px;margin-bottom:18px;box-shadow:var(--sh);scroll-margin-top:78px}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.stepnum{background:var(--grad);color:#fff;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.steptitle{font-weight:700;font-size:16px}
+.nav-line{display:flex;flex-direction:row;align-items:center;flex-wrap:nowrap;gap:8px;overflow-x:auto;overflow-y:visible;min-height:48px;padding:8px 2px}
+.crumbs{display:flex;align-items:center;flex-wrap:nowrap;gap:8px;flex:0 0 auto}
+.crumb{display:inline-flex;align-items:center;gap:6px;background:var(--orangeSoft);color:var(--orangeDark);border:1.5px solid var(--orange);border-radius:11px;padding:10px 16px;font-weight:600;font-size:14px;cursor:pointer;transition:.15s;white-space:nowrap}
+.crumb:hover{filter:brightness(.97)}
+.crumb .x{font-size:11px;opacity:.7}
+.arrow{color:var(--dim);font-weight:800;font-size:16px}
+.opts{display:flex;flex-wrap:nowrap;gap:8px;margin-top:0;flex:0 0 auto}
+#brands{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;flex:1 1 auto}
+.opt{white-space:nowrap;flex:0 0 auto;padding:10px 16px;border-radius:11px;border:1.5px solid var(--border);background:#fff;color:var(--text);cursor:pointer;font-weight:600;font-size:14px;transition:.18s}
+.opt:hover{transform:translateY(-2px);box-shadow:var(--shHover);border-color:#ffcf9a}
+.opt.off{opacity:.5;cursor:not-allowed;background:#fafafa}
+.opt.off:hover{transform:none;box-shadow:none;border-color:var(--border)}
+.soon{display:block;font-size:10px;font-weight:700;color:var(--dim);margin-top:3px}
+.hint{font-size:12px;color:var(--dim);margin-top:12px}
+.reset{background:#fff;border:1.5px solid var(--border);border-radius:9px;color:var(--orangeDark);font-weight:700;font-size:12.5px;cursor:pointer;padding:7px 12px;font-family:var(--font);transition:.15s}
+.reset:hover{border-color:#ffcf9a;background:var(--orangeSoft)}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ---- Card 1: category / brand / family motion ---- */
+@keyframes optIn{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+#brands.anim .opt{animation:optIn .35s cubic-bezier(.22,.61,.36,1) both}
+@keyframes crumbIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+@keyframes cardReveal{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.opt{transition:transform .18s,box-shadow .18s,border-color .18s,background .18s,color .18s}
+.opt:hover{transform:translateY(-3px)}
+.opt:active{transform:scale(.96)}
+.opts .opt:nth-child(1),#brands .opt:nth-child(1),.famgrid .opt:nth-child(1){animation-delay:.02s}
+.opts .opt:nth-child(2),#brands .opt:nth-child(2),.famgrid .opt:nth-child(2){animation-delay:.06s}
+.opts .opt:nth-child(3),#brands .opt:nth-child(3),.famgrid .opt:nth-child(3){animation-delay:.10s}
+.opts .opt:nth-child(4),#brands .opt:nth-child(4),.famgrid .opt:nth-child(4){animation-delay:.14s}
+.opts .opt:nth-child(5),#brands .opt:nth-child(5),.famgrid .opt:nth-child(5){animation-delay:.18s}
+#brands .opt:nth-child(n+6),.famgrid .opt:nth-child(n+6){animation-delay:.22s}
+.crumb{transition:transform .16s,filter .16s}
+.crumb.cnew{animation:crumbIn .3s cubic-bezier(.22,.61,.36,1) both}
+.crumb.locked{cursor:default}
+.crumb.locked:hover{transform:none}
+.crumb:hover{transform:translateY(-1px)}.crumb:active{transform:scale(.96)}
+/* ---- Card entrance when it appears after completing a step ---- */
+.card.reveal{animation:cardReveal .45s cubic-bezier(.22,.61,.36,1) both}
+.reset{transition:transform .15s,box-shadow .18s,background .18s,border-color .18s,opacity .18s}
+.reset:hover{transform:translateY(-1px)}.reset:active{transform:scale(.95)}
+.next{background:var(--card);border-radius:var(--r);border:1px dashed #d9dde2;padding:22px;color:var(--dim);font-size:14px;text-align:center}
+.subsec{margin-top:16px;border-top:1px dashed var(--border);padding-top:16px}
+.sublabel{font-size:12px;font-weight:700;color:var(--dim);margin-bottom:10px}
+.famgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px}
+#brands .opt,.famgrid .opt{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;font-size:11.5px;line-height:1.2;padding:11px 8px;min-height:42px;display:flex;align-items:center;justify-content:center}
+.hidden{display:none!important}
+.colorrow{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:6px}
+.colorcol{flex:1 1 160px;min-width:150px;max-width:210px}
+@keyframes colIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+#famDetail.anim .colorcol{animation:colIn .45s cubic-bezier(.22,.61,.36,1) both}
+#famDetail.anim .colorcol:nth-child(1){animation-delay:.04s}#famDetail.anim .colorcol:nth-child(2){animation-delay:.13s}
+#famDetail.anim .colorcol:nth-child(3){animation-delay:.22s}#famDetail.anim .colorcol:nth-child(4){animation-delay:.31s}
+#famDetail.anim .colorcol:nth-child(5){animation-delay:.40s}#famDetail.anim .colorcol:nth-child(n+6){animation-delay:.48s}
+.colorimg{height:120px;border:1.5px solid var(--border);border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:transform .3s,box-shadow .3s}
+.colorcol:hover .colorimg{transform:translateY(-3px);box-shadow:var(--shHover)}
+.colorimg img{transition:transform .4s cubic-bezier(.22,.61,.36,1)}
+.colorcol:hover .colorimg img{transform:scale(1.05)}
+.colorimg img{width:100%;height:100%;object-fit:contain}
+.colorname{text-align:center;font-weight:700;font-size:13px;margin:8px 0 10px}
+.stbox{display:flex;flex-direction:column;gap:6px}
+@keyframes stIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#famDetail.anim .stbox .strow{animation:stIn .4s cubic-bezier(.22,.61,.36,1) both}
+#famDetail.anim .stbox .strow:nth-child(1){animation-delay:.10s}#famDetail.anim .stbox .strow:nth-child(2){animation-delay:.16s}
+#famDetail.anim .stbox .strow:nth-child(3){animation-delay:.22s}#famDetail.anim .stbox .strow:nth-child(4){animation-delay:.28s}
+#famDetail.anim .stbox .strow:nth-child(n+5){animation-delay:.34s}
+.strow{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 30px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:600;transition:.15s;text-align:center}
+.strow .cb{position:absolute;left:9px;top:50%;transform:translateY(-50%)}
+.stfields{display:flex;flex-direction:column;gap:4px;margin:2px 0 4px;padding:0 2px}
+.txt{width:100%;border:1.5px solid var(--border);font-family:var(--font);outline:none;color:var(--text)}
+.txt:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(246,139,30,.14)}
+.flab{font-size:10.5px;font-weight:700;color:var(--dim);margin:2px 0 0}
+.flab.req{color:var(--danger)}
+.stfields .txt{padding:8px 10px;font-size:12.5px;border-radius:9px}
+.plabel{display:block;font-size:11px;font-weight:700;color:var(--dim);margin-bottom:6px}
+.plabel.req{color:var(--danger)}
+.psel{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:14px;font-weight:600;font-family:var(--font);background:#fff;color:var(--text);outline:none;cursor:pointer;height:46px;appearance:auto}
+.psel:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(246,139,30,.14)}
+.qcount{background:var(--orangeSoft);color:var(--orangeDark);font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px}
+.qtoggle{font-size:12.5px;font-weight:700;color:var(--orangeDark);user-select:none;transition:color .2s}
+#queueList{overflow:hidden;max-height:0;opacity:0;transition:max-height .42s cubic-bezier(.22,.61,.36,1),opacity .3s ease,margin-top .3s ease}
+#queueList.open{max-height:6000px;opacity:1;margin-top:4px}
+.qbrand{border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.qbrandhead{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#fbfbfc;font-weight:800;font-size:14px;transition:background .15s}
+.qbrandhead:hover{background:#f4f5f7}
+.qbadge{margin-left:auto;background:var(--orangeSoft);color:var(--orangeDark);font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px}
+.qfam{border-top:1px solid var(--border)}
+.qfamhead{display:flex;align-items:center;gap:8px;padding:10px 14px 10px 28px;cursor:pointer;font-weight:700;font-size:13px;transition:background .15s}
+.qfamhead:hover{background:#fafbfc}
+.qbadge2{color:var(--dim);font-weight:700;font-size:12px}
+.qchev{display:inline-block;width:12px;text-align:center;color:var(--dim);font-size:11px}
+.qbody{overflow:hidden;max-height:0;opacity:0;transition:max-height .4s cubic-bezier(.22,.61,.36,1),opacity .3s}
+.qbody.open{max-height:6000px;opacity:1}
+.qbody .qrow{margin:8px 14px 8px 30px}
+/* children rise/stagger in when a level expands */
+@keyframes qIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.qbody.justopen>.qfam,.qbody.justopen>.qrow,#queueList.justopen>.qbrand{animation:qIn .38s cubic-bezier(.22,.61,.36,1) both}
+.qbody.justopen>*:nth-child(1),#queueList.justopen>*:nth-child(1){animation-delay:.05s}
+.qbody.justopen>*:nth-child(2),#queueList.justopen>*:nth-child(2){animation-delay:.11s}
+.qbody.justopen>*:nth-child(3),#queueList.justopen>*:nth-child(3){animation-delay:.17s}
+.qbody.justopen>*:nth-child(4),#queueList.justopen>*:nth-child(4){animation-delay:.23s}
+.qbody.justopen>*:nth-child(5),#queueList.justopen>*:nth-child(5){animation-delay:.29s}
+.qbody.justopen>*:nth-child(n+6),#queueList.justopen>*:nth-child(n+6){animation-delay:.34s}
+.qbrandhead,.qfamhead{transition:background .15s}
+.qchev{transition:transform .25s cubic-bezier(.22,.61,.36,1)}
+.qgroup{margin-bottom:14px}
+.qgrouphead{font-size:12px;font-weight:800;color:var(--text);margin:6px 0 8px;letter-spacing:.2px}
+.prodgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* ---------------- MOBILE ---------------- */
+@media(max-width:600px){
+  nav{padding:0 14px}
+  .logo{font-size:21px}.star{font-size:17px}
+  .demoTag{font-size:9px;padding:4px 7px;max-width:42%;text-align:right;line-height:1.2}
+  .wrap{padding:20px 14px 70px}
+  .card{padding:18px 15px;border-radius:14px}
+  .head{margin-bottom:18px;flex-wrap:wrap;gap:8px}
+  .steptitle{font-size:15px}
+  /* category / brand / family boxes: smaller + more per row */
+  #brands,.famgrid{grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:7px}
+  .opt{font-size:12px;padding:9px 10px}
+  #brands .opt,.famgrid .opt{font-size:11px;padding:10px 6px;min-height:40px}
+  .crumb{font-size:12.5px;padding:9px 12px}
+  /* colour columns: two per row, tighter, left-aligned on mobile */
+  .colorrow{gap:12px;justify-content:flex-start!important}
+  .colorcol{flex:0 1 44%;min-width:0;max-width:none}
+  .colorimg{height:96px}
+  .colorname{font-size:12.5px}
+  /* production dropdowns stack */
+  .prodgrid{grid-template-columns:1fr}
+  .psel{height:44px;font-size:13.5px}
+  /* buttons a touch smaller, wrap nicely */
+  .reset{font-size:12px;padding:8px 10px}
+  /* family-detail header buttons wrap under title if needed */
+  #famCard .head>div:last-child{flex-wrap:wrap;justify-content:flex-end}
+  /* queue header: let everything wrap instead of overflowing */
+  #queueCard .head{flex-wrap:wrap;gap:10px}
+  #queueCard .head>div{flex-wrap:wrap}
+  .qbrandhead{font-size:13px;padding:11px 12px}
+  .qfamhead{font-size:12.5px;padding:9px 12px 9px 24px}
+  .qrow{gap:10px;padding:9px 10px}
+  .qthumb{width:40px;height:40px}
+  .qname{font-size:12.5px}.qmeta{font-size:11px}
+  .qbody .qrow{margin:7px 8px 7px 20px}
+}
+.qrow{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;background:#fff}
+.qthumb{width:46px;height:46px;border-radius:9px;background:#fff;border:1px solid var(--border);object-fit:contain;flex:0 0 auto}
+.qmain{flex:1;min-width:0}
+.qname{font-size:13px;font-weight:700;line-height:1.25}
+.qmeta{font-size:11.5px;color:var(--dim);margin-top:3px}
+.qrm{flex:0 0 auto;width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--danger);font-weight:800;cursor:pointer;font-size:14px;transition:.15s}
+.qrm:hover{background:#fde8e8;border-color:#f3b9b9}
+.qempty{font-size:13px;color:var(--dim);text-align:center;padding:10px}
+.strow:hover{border-color:#ffcf9a}
+.strow.on{border-color:var(--orange);background:var(--orangeSoft)}
+.strow .cb{width:18px;height:18px;border-radius:6px;border:2px solid #c7ccd3;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;flex:0 0 auto}
+.strow.on .cb{border-color:var(--orange);background:var(--grad)}
+.strow.added{border-color:#d6ead9;background:#f1f9f3;color:#3c7a52;cursor:not-allowed}
+.strow.added .cb{border-color:var(--green);background:var(--green)}
+.strow.added span{font-weight:700}
+.tab{background:#fff;border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-weight:700;font-size:12.5px;cursor:pointer;padding:7px 12px;font-family:var(--font);transition:.15s}
+.tab.on{background:var(--orangeSoft);border-color:var(--orange);color:var(--orangeDark)}
+.adminwrap table{width:100%;border-collapse:collapse;font-size:12.5px}
+.adminwrap th{text-align:left;padding:9px 10px;border-bottom:2px solid var(--border);color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+.adminwrap td{padding:9px 10px;border-bottom:1px solid var(--border)}
+.adminwrap tr:hover td{background:#fafbfc}
+.badge{background:var(--orangeSoft);color:var(--orangeDark);font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
+.btnG{background:var(--green);color:#fff;border:none;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;padding:10px 16px;font-family:var(--font)}
+.loginbox{max-width:380px;margin:60px auto;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:34px;box-shadow:var(--sh)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#16331f;color:#dff5e6;padding:12px 20px;border-radius:12px;font-weight:700;font-size:14px;z-index:200;box-shadow:0 8px 28px rgba(0,0,0,.25);opacity:0;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #fff6;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.famserie{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.famserie .opt{width:150px;flex:0 0 150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;font-size:11.5px;line-height:1.2;padding:11px 8px;min-height:42px;display:flex;align-items:center;justify-content:center}
+.triogrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.triogrid .psel{font-size:12px;padding:9px 9px;height:44px;width:100%;text-overflow:ellipsis}
+.entrygrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.cwgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.cwgrid .psel{font-size:12px;height:44px;padding:9px 9px;width:100%}
+.triogrid .flab,.entrygrid .flab,.cwgrid .flab{margin-bottom:3px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head><body>
+<nav><div><span class="logo">JUMIA</span><span class="star">&#9733;</span></div>
+<div style="display:flex;gap:8px"><button class="tab on" id="tabV" onclick="switchView('vendor')">Vendor</button><button class="tab" id="tabA" onclick="switchView('admin')">&#128274; Admin</button></div></nav>
+<div class="wrap">
+<div id="vendor">
+<div id="page1" style="min-height:calc(100vh - 160px);display:flex;flex-direction:column;align-items:center;justify-content:center">
+  <div style="text-align:center;margin-bottom:24px"><h1 style="font-size:34px;margin:0 0 6px">Enter Your Shop Name</h1><p class="muted" style="color:var(--dim);margin:0">Then build your bulk product list.</p></div>
+  <div class="card" style="width:100%;max-width:520px;margin-bottom:0">
+    <input class="txt" id="shop" placeholder="Enter your shop name" style="padding:15px 16px;font-size:17px;border-radius:11px" onkeydown="if(event.key==='Enter')startShop()"/>
+    <p style="font-size:12.5px;color:var(--dim);margin:10px 2px 0">&#9888; Copy the Shop Name from your Vendor Center account exactly as written.</p>
+    <button class="reset" style="margin-top:16px;width:100%;padding:14px;font-size:15px;background:var(--grad);color:#fff;border:none" onclick="startShop()">Continue &#8594;</button>
+  </div>
+</div>
+<div id="picker" class="hidden">
+<div class="hero" id="hero" style="justify-content:space-between;align-items:center">
+  <div style="display:flex;align-items:center;gap:18px">
+    <div class="hero-emoji">&#128075;</div>
+    <div>
+      <div class="hero-title">Hi <span id="greetShop"></span>,</div>
+      <div class="hero-sub">Ready to create your products</div>
+    </div>
+  </div>
+  <button onclick="changeShopName()" style="background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.5);color:#fff;border-radius:11px;font-weight:700;font-size:13px;padding:10px 16px;cursor:pointer;backdrop-filter:blur(4px);white-space:nowrap;font-family:var(--font);flex-shrink:0">&#9998; Change Shop Name</button>
+</div>
+<div class="card" id="navCard">
+  <div class="head" style="justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:10px"><span class="stepnum">1</span><span class="steptitle" id="title">Select Main Category</span></div>
+    <button class="reset" id="reset" style="visibility:hidden" onclick="resetNav()">&#8617; Start over</button>
+  </div>
+  <div class="nav-line" id="line"></div>
+  <div id="brandbar" class="subsec hidden">
+    <div class="sublabel">Select Brand</div>
+    <div class="opts" id="brands"></div>
+  </div>
+</div>
+
+<div class="card hidden" id="famCard">
+  <div class="head" style="justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:10px"><span class="stepnum">2</span><span class="steptitle" id="famTitle">Select Model Family</span></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="reset hidden" id="famClear" onclick="clearFamSel()" style="color:var(--danger)">&#128465; Clear all</button>
+      <button class="reset" id="brandBack" onclick="changeBrand()">&#8617; Change brand</button>
+      <button class="reset hidden" id="famBack" onclick="backToFams()">&#8617; Change family</button>
+    </div>
+  </div>
+  <div class="famgrid" id="fams"></div>
+  <div id="famDetail" class="hidden"></div>
+</div>
+
+<div class="card hidden" id="queueCard">
+  <div class="head" style="justify-content:space-between;cursor:pointer" onclick="toggleQueue()">
+    <div style="display:flex;align-items:center;gap:10px"><span class="stepnum">3</span><span class="steptitle">Your Queue</span><span class="qcount" id="qcount">0 items</span></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="reset" id="submitBtn" onclick="event.stopPropagation();submitAll()">&#8593; Submit All</button>
+      <button class="reset" id="clearBtn" onclick="event.stopPropagation();clearQueue()" style="color:var(--danger)">&#128465; Clear All</button>
+      <span class="qtoggle" id="qtoggle">Show &#9662;</span>
+    </div>
+  </div>
+  <div id="queueList"></div>
+</div>
+</div><!-- /picker -->
+</div><!-- /vendor -->
+
+<div id="admin" class="hidden">
+  <div class="loginbox" id="login">
+    <div style="width:60px;height:60px;border-radius:16px;background:var(--orangeSoft);display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:14px">&#128274;</div>
+    <h2 style="margin:0 0 6px">Admin Panel</h2>
+    <p style="color:var(--dim);margin:0 0 18px;font-size:13px">Enter password to manage submissions</p>
+    <input class="txt" type="password" id="pass" placeholder="Password" style="padding:12px 14px;border-radius:11px;margin-bottom:10px" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <p id="passErr" class="hidden" style="color:var(--danger);font-size:12px;margin:0 0 10px">Incorrect password</p>
+    <button class="reset" style="width:100%;padding:13px;background:var(--grad);color:#fff;border:none" onclick="doLogin()">Login</button>
+  </div>
+  <div id="dash" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div><h1 style="margin:0">Submissions Dashboard</h1><p style="color:var(--dim);margin:4px 0 0;font-size:13px"><span id="subCount" style="color:var(--green);font-weight:800">0</span> models submitted</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="reset" onclick="loadSubs()">&#8635; Refresh</button>
+        <button class="btnG" onclick="downloadCsv()">&#8595; Download Bulk CSV</button>
+        <button class="reset" style="color:var(--danger);border-color:#f3b9b9" onclick="clearSubs()">&#128465; Clear All</button>
+      </div>
+    </div>
+    <div class="card adminwrap" id="subsBox" style="padding:0;overflow:hidden"><p style="color:var(--dim);text-align:center;margin:30px 0">Loading...</p></div>
+  </div>
+</div>
+</div><!-- /wrap -->
+
+<script>
+var TREE={
+  "Phones":{children:{"Android":{active:true},"iOS":{active:true},"Feature Phones":{active:false}}},
+  "Tablets":{children:{"Android":{active:false},"iOS":{active:false}}},
+  "Accessories":{children:{"Smart Watches":{active:false},"Bluetooth Earbuds & Over Earphones":{active:false},"Chargers":{active:false},"Power Banks":{active:false},"Cables":{active:false}}}
+};
+var path=[]; var fwdNav=false; // fwdNav=true only when drilling deeper
+var SUPABASE_URL="https://vxscfljgtmddnmzmwitq.supabase.co";
+var SUPABASE_KEY="sb_publishable_3Im_1dgtrjvTitchLnjIzA_Vu3RaDPw";
+var sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+var PASS="admin123";
+var shopName="";
+var BRANDS=["Samsung","Xiaomi","Honor","Infinix","Oppo","Realme","Vivo","Motorola"];
+// sample families per brand (nav demo only — real ones come from the catalog)
+var SAMPLE_FAMS={"Samsung":["Galaxy A07 4G","Galaxy A17 4G","Galaxy A17 5G","Galaxy A26 5G","Galaxy A36 5G","Galaxy A56 5G","Galaxy A37 5G","Galaxy A57 5G","Galaxy S25 FE 5G","Galaxy S25 5G","Galaxy S25 Plus 5G","Galaxy S25 Ultra 5G","Galaxy S26 5G","Galaxy S26 Plus 5G","Galaxy S26 Ultra 5G"],"Infinix":["Smart 10 4G","Smart 20 4G","Hot 60i 4G","Hot 60 5G","Hot 60 Pro 4G","Hot 60 Pro Plus 4G","Note 50s 5G","Note Edge 5G","Note 60 5G","Note 60 Pro 5G","GT 30 Pro 5G"],"Honor":["X5c","X5c Plus","X6c 4G","X7d 4G","X7d 5G","X8d 4G","X9d 5G","400 Lite 5G","400 5G","400 Pro 5G","600 Lite 5G","600 5G","600 Pro 5G"],"Xiaomi":["Redmi A5 4G","Redmi A7 Pro 4G","Redmi 15c 4G","Redmi 15 4G","Redmi Note 15 4G","Redmi Note 15 5G","Redmi Note 15 Pro 5G","Redmi Note 15 Pro Plus 5G","Poco C85 4G"],"Oppo":["A5i 4G","A5x 4G","A5 4G","A5 Pro 4G","A6x 4G","A6 4G","A6 Pro 4G","A6 Pro 5G","Reno 15f 5G","Reno 15 5G","Reno 15 Pro 5G","Find X9 Pro 5G"],"Realme":["Note 60x 4G","Note 70 4G","C71 4G","C75x 4G","C85 4G","C85 Pro 4G","14T 5G","14 5G","14 Pro 5G","14 Pro Plus 5G","15T 5G","15 5G","15 Pro 5G"],"Vivo":["Y04 4G","Y05 4G","Y21D 4G","Y31D 4G","Y29 4G","V60 Lite 4G","V60 Lite 5G","V60 5G","V70 FE 5G","V70 5G","X300 Pro 5G"],"Motorola":["G35 5G","G56 5G","Edge 60 Fusion 5G","Edge 60 5G","Edge 60 Pro 5G"]};
+var ADATA={"Samsung":{"Galaxy A07 4G":{"Black":{"img":"https://i.ibb.co/MkMNMkSH/1.jpg","variants":[{"s":"4GB / 64GB","name":"Galaxy A07 Dual SIM 4G 4GB - 64GB - Black","bc":"8806097655459"},{"s":"4GB / 128GB","name":"Galaxy A07 Dual SIM 4G 4GB - 128GB - Black","bc":"8806097853770"},{"s":"6GB / 128GB","name":"Galaxy A07 Dual SIM 4G 6GB - 128GB - Black","bc":"8806097853749"},{"s":"8GB / 256GB","name":"Galaxy A07 Dual SIM 4G 8GB - 256GB - Black","bc":"8806097853732"}]},"Green":{"img":"https://i.ibb.co/N2s6bdS8/1.jpg","variants":[{"s":"4GB / 64GB","name":"Galaxy A07 Dual SIM 4G 4GB - 64GB - Green","bc":"8806097853794"},{"s":"4GB / 128GB","name":"Galaxy A07 Dual SIM 4G 4GB - 128GB - Green","bc":"8806097853787"},{"s":"6GB / 128GB","name":"Galaxy A07 Dual SIM 4G 6GB - 128GB - Green","bc":"8806097853763"},{"s":"8GB / 256GB","name":"Galaxy A07 Dual SIM 4G 8GB - 256GB - Green","bc":"8806097853756"}]},"Light Violet":{"img":"https://i.ibb.co/JFSZCYcm/1.jpg","variants":[{"s":"4GB / 64GB","name":"Galaxy A07 Dual SIM 4G 4GB - 64GB - Light Violet","bc":"8806097853848"},{"s":"4GB / 128GB","name":"Galaxy A07 Dual SIM 4G 4GB - 128GB - Light Violet","bc":"8806097853831"},{"s":"6GB / 128GB","name":"Galaxy A07 Dual SIM 4G 6GB - 128GB - Light Violet","bc":"8806097853824"},{"s":"8GB / 256GB","name":"Galaxy A07 Dual SIM 4G 8GB - 256GB - Light Violet","bc":"8806097853800"}]}},"Galaxy A17 4G":{"Black":{"img":"https://i.ibb.co/WpMhCD1c/1.jpg","variants":[{"s":"4GB / 128GB","name":"Galaxy A17 Dual SIM 4G 4GB - 128GB - Black","bc":"8806097657460"},{"s":"6GB / 128GB","name":"Galaxy A17 Dual SIM 4G 6GB - 128GB - Black","bc":"8806097657538"},{"s":"8GB / 256GB","name":"Galaxy A17 Dual SIM 4G 8GB - 256GB - Black","bc":"8806097657439"}]},"Grey":{"img":"https://i.ibb.co/39LJpsLw/1.jpg","variants":[{"s":"4GB / 128GB","name":"Galaxy A17 Dual SIM 4G 4GB - 128GB - Grey","bc":"8806097657606"},{"s":"6GB / 128GB","name":"Galaxy A17 Dual SIM 4G 6GB - 128GB - Grey","bc":"8806097657644"},{"s":"8GB / 256GB","name":"Galaxy A17 Dual SIM 4G 8GB - 256GB - Grey","bc":"8806097657576"}]},"Light Blue":{"img":"https://i.ibb.co/SDHjHRYs/1.jpg","variants":[{"s":"4GB / 128GB","name":"Galaxy A17 Dual SIM 4G 4GB - 128GB - Light Blue","bc":"8806097657736"},{"s":"6GB / 128GB","name":"Galaxy A17 Dual SIM 4G 6GB - 128GB - Light Blue","bc":"8806097657774"},{"s":"8GB / 256GB","name":"Galaxy A17 Dual SIM 4G 8GB - 256GB - Light Blue","bc":"8806097657699"}]}},"Galaxy A17 5G":{"Black":{"img":"https://i.ibb.co/WpMhCD1c/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy A17 Dual SIM 5G 8GB - 256GB - Black","bc":"8806097666578"}]},"Grey":{"img":"https://i.ibb.co/39LJpsLw/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy A17 Dual SIM 5G 8GB - 256GB - Grey","bc":"8806097668510"}]},"Blue":{"img":"https://i.ibb.co/tMS57gX6/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy A17 Dual SIM 5G 8GB - 256GB - Blue","bc":"8806097666417"}]}},"Galaxy A26 5G":{"Black":{"img":"https://i.ibb.co/2YRcwVD9/1.jpg","variants":[{"s":"6GB / 128GB","name":"Galaxy A26 Dual SIM 5G 6GB - 128GB - Black","bc":"8806097102465"},{"s":"8GB / 256GB","name":"Galaxy A26 Dual SIM 5G 8GB - 256GB - Black","bc":"8806097102434"}]},"Peach Pink":{"img":"https://i.ibb.co/HTRK2tQv/1.jpg","variants":[{"s":"6GB / 128GB","name":"Galaxy A26 Dual SIM 5G 6GB - 128GB - Peach Pink","bc":"8806097102274"},{"s":"8GB / 256GB","name":"Galaxy A26 Dual SIM 5G 8GB - 256GB - Peach Pink","bc":"8806097102243"}]},"White":{"img":"https://i.ibb.co/39SBtPSn/1.jpg","variants":[{"s":"6GB / 128GB","name":"Galaxy A26 Dual SIM 5G 6GB - 128GB - White","bc":"8806097102380"},{"s":"8GB / 256GB","name":"Galaxy A26 Dual SIM 5G 8GB - 256GB - White","bc":"8806097102342"}]}},"Galaxy A36 5G":{"Awesome Black":{"img":"https://i.ibb.co/ZqzYsbm/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A36 Dual SIM 5G 8GB - 128GB - Awesome Black","bc":"8806097048299"},{"s":"8GB / 256GB","name":"Galaxy A36 Dual SIM 5G 8GB - 256GB - Awesome Black","bc":"8806097048244"}]},"Awesome Lavender":{"img":"https://i.ibb.co/hRwKsdcw/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A36 Dual SIM 5G 8GB - 128GB - Awesome Lavender","bc":"8806097048916"},{"s":"8GB / 256GB","name":"Galaxy A36 Dual SIM 5G 8GB - 256GB - Awesome Lavender","bc":"8806097048879"}]},"Awesome White":{"img":"https://i.ibb.co/rGR3R0D8/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A36 Dual SIM 5G 8GB - 128GB - Awesome White","bc":"8806097048626"},{"s":"8GB / 256GB","name":"Galaxy A36 Dual SIM 5G 8GB - 256GB - Awesome White","bc":"8806097048534"}]},"Awesome Lime":{"img":"https://i.ibb.co/nNpkvr1m/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A36 Dual SIM 5G 8GB - 128GB - Awesome Lime","bc":"8806097049241"},{"s":"8GB / 256GB","name":"Galaxy A36 Dual SIM 5G 8GB - 256GB - Awesome Lime","bc":"8806097049159"}]}},"Galaxy A56 5G":{"Awesome Light Gray":{"img":"https://i.ibb.co/gLK4VJL3/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A56 Dual SIM 5G 8GB - 128GB - Awesome Light Gray","bc":"8806097047162"},{"s":"8GB / 256GB","name":"Galaxy A56 Dual SIM 5G 8GB - 256GB - Awesome Light Gray","bc":"8806097047964"},{"s":"12GB / 256GB","name":"Galaxy A56 Dual SIM 5G 12GB - 256GB - Awesome Light Gray","bc":"8806097047926"}]},"Awesome Graphite":{"img":"https://i.ibb.co/1fh2FFqG/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A56 Dual SIM 5G 8GB - 128GB - Awesome Graphite","bc":"8806097047681"},{"s":"8GB / 256GB","name":"Galaxy A56 Dual SIM 5G 8GB - 256GB - Awesome Graphite","bc":"8806097047643"},{"s":"12GB / 256GB","name":"Galaxy A56 Dual SIM 5G 12GB - 256GB - Awesome Graphite","bc":"8806097047605"}]},"Awesome Olive":{"img":"https://i.ibb.co/YFNTnFP9/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A56 Dual SIM 5G 8GB - 128GB - Awesome Olive","bc":"8806097047841"},{"s":"8GB / 256GB","name":"Galaxy A56 Dual SIM 5G 8GB - 256GB - Awesome Olive","bc":"8806097047810"},{"s":"12GB / 256GB","name":"Galaxy A56 Dual SIM 5G 12GB - 256GB - Awesome Olive","bc":"8806097047766"}]},"Awesome Pink":{"img":"https://i.ibb.co/d0MnJcNK/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A56 Dual SIM 5G 8GB - 128GB - Awesome Pink","bc":"8806097047391"},{"s":"8GB / 256GB","name":"Galaxy A56 Dual SIM 5G 8GB - 256GB - Awesome Pink","bc":"8806097047292"},{"s":"12GB / 256GB","name":"Galaxy A56 Dual SIM 5G 12GB - 256GB - Awesome Pink","bc":"8806097047247"}]}},"Galaxy A37 5G":{"Awesome Charcoal":{"img":"https://i.ibb.co/vxMQCwKQ/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A37 Dual SIM 5G 8GB - 128GB - Awesome Charcoal","bc":"8806099055707"},{"s":"8GB / 256GB","name":"Galaxy A37 Dual SIM 5G 8GB - 256GB - Awesome Charcoal","bc":"8806099055684"},{"s":"12GB / 256GB","name":"Galaxy A37 Dual SIM 5G 12GB - 256GB - Awesome Charcoal","bc":"8806099140984"}]},"Awesome Gray Green":{"img":"https://i.ibb.co/S2NkbbN/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A37 Dual SIM 5G 8GB - 128GB - Awesome Gray Green","bc":"8806099055585"},{"s":"8GB / 256GB","name":"Galaxy A37 Dual SIM 5G 8GB - 256GB - Awesome Gray Green","bc":"8806099055561"},{"s":"12GB / 256GB","name":"Galaxy A37 Dual SIM 5G 12GB - 256GB - Awesome Gray Green","bc":"8806099140991"}]},"Awesome Lavender":{"img":"https://i.ibb.co/fVgYPyCx/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A37 Dual SIM 5G 8GB - 128GB - Awesome Lavender","bc":"8806099055523"},{"s":"8GB / 256GB","name":"Galaxy A37 Dual SIM 5G 8GB - 256GB - Awesome Lavender","bc":"8806099055509"},{"s":"12GB / 256GB","name":"Galaxy A37 Dual SIM 5G 12GB - 256GB - Awesome Lavender","bc":"8806099141110"}]},"Awesome White":{"img":"https://i.ibb.co/W4f0fJbT/1.jpg","variants":[{"s":"8GB / 128GB","name":"Galaxy A37 Dual SIM 5G 8GB - 128GB - Awesome White","bc":"8806099055646"},{"s":"8GB / 256GB","name":"Galaxy A37 Dual SIM 5G 8GB - 256GB - Awesome White","bc":"8806099055622"},{"s":"12GB / 256GB","name":"Galaxy A37 Dual SIM 5G 12GB - 256GB - Awesome White","bc":"8806099140977"}]}},"Galaxy A57 5G":{"Awesome Navy":{"img":"https://i.ibb.co/G4L2vnNH/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy A57 Dual SIM 5G 8GB - 256GB - Awesome Navy","bc":"8806099049164"},{"s":"12GB / 256GB","name":"Galaxy A57 Dual SIM 5G 12GB - 256GB - Awesome Navy","bc":"8806099049126"},{"s":"12GB / 512GB","name":"Galaxy A57 Dual SIM 5G 12GB - 512GB - Awesome Navy","bc":"8806099049089"}]},"Awesome Gray":{"img":"https://i.ibb.co/8DprbCMC/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy A57 Dual SIM 5G 8GB - 256GB - Awesome Gray","bc":"8806099049485"},{"s":"12GB / 256GB","name":"Galaxy A57 Dual SIM 5G 12GB - 256GB - Awesome Gray","bc":"8806099049447"},{"s":"12GB / 512GB","name":"Galaxy A57 Dual SIM 5G 12GB - 512GB - Awesome Gray","bc":"8806099049393"}]},"Awesome IcyBlue":{"img":"https://i.ibb.co/fTG1d3p/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy A57 Dual SIM 5G 8GB - 256GB - Awesome IcyBlue","bc":"8806099049003"},{"s":"12GB / 256GB","name":"Galaxy A57 Dual SIM 5G 12GB - 256GB - Awesome IcyBlue","bc":"8806099049607"},{"s":"12GB / 512GB","name":"Galaxy A57 Dual SIM 5G 12GB - 512GB - Awesome IcyBlue","bc":"8806099049560"}]},"Awesome Lilac":{"img":"https://i.ibb.co/N6h8w8dh/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy A57 Dual SIM 5G 8GB - 256GB - Awesome Lilac","bc":"8806099049324"},{"s":"12GB / 256GB","name":"Galaxy A57 Dual SIM 5G 12GB - 256GB - Awesome Lilac","bc":"8806099049294"},{"s":"12GB / 512GB","name":"Galaxy A57 Dual SIM 5G 12GB - 512GB - Awesome Lilac","bc":"8806099049249"}]}},"Galaxy S25 FE 5G":{"Jet Black":{"img":"https://i.ibb.co/q3s0YJHV/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy S25 FE Dual SIM 5G 8GB - 256GB - Jet Black","bc":"8806097664697"},{"s":"8GB / 512GB","name":"Galaxy S25 FE Dual SIM 5G 8GB - 512GB - Jet Black","bc":"8806097664659"}]},"Navy":{"img":"https://i.ibb.co/wFC2GXh6/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy S25 FE Dual SIM 5G 8GB - 256GB - Navy","bc":"8806097664277"},{"s":"8GB / 512GB","name":"Galaxy S25 FE Dual SIM 5G 8GB - 512GB - Navy","bc":"8806097664536"}]},"White":{"img":"https://i.ibb.co/WNrtCwJk/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy S25 FE Dual SIM 5G 8GB - 256GB - White","bc":"8806097665946"},{"s":"8GB / 512GB","name":"Galaxy S25 FE Dual SIM 5G 8GB - 512GB - White","bc":"8806097665847"}]},"IcyBlue":{"img":"https://i.ibb.co/8nrfnwXn/1.jpg","variants":[{"s":"8GB / 256GB","name":"Galaxy S25 FE Dual SIM 5G 8GB - 256GB - IcyBlue","bc":"8806097665243"},{"s":"8GB / 512GB","name":"Galaxy S25 FE Dual SIM 5G 8GB - 512GB - IcyBlue","bc":"8806097665144"}]}},"Galaxy S25 5G":{"Navy":{"img":"https://i.ibb.co/5Xf6qc4j/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Dual SIM 5G 12GB - 256GB - Navy","bc":"8806095888217"}]},"IcyBlue":{"img":"https://i.ibb.co/rqTZNDd/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Dual SIM 5G 12GB - 256GB - IcyBlue","bc":"8806095888040"}]},"Mint":{"img":"https://i.ibb.co/60LCrDq4/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Dual SIM 5G 12GB - 256GB - Mint","bc":"8806095887876"}]},"Silver Shadow":{"img":"https://i.ibb.co/4ggknpC1/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Dual SIM 5G 12GB - 256GB - Silver Shadow","bc":"8806095888361"}]}},"Galaxy S25 Plus 5G":{"Navy":{"img":"https://i.ibb.co/WNrtCwJk/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Plus Dual SIM 5G 12GB - 256GB - Navy","bc":"8806095888927"}]},"IcyBlue":{"img":"https://i.ibb.co/rqTZNDd/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Plus Dual SIM 5G 12GB - 256GB - IcyBlue","bc":"8806095888767"}]},"Mint":{"img":"https://i.ibb.co/60LCrDq4/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Plus Dual SIM 5G 12GB - 256GB - Mint","bc":"8806095888637"}]},"Silver Shadow":{"img":"https://i.ibb.co/4ggknpC1/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Plus Dual SIM 5G 12GB - 256GB - Silver Shadow","bc":"8806095888514"}]}},"Galaxy S25 Ultra 5G":{"Titanium Black":{"img":"https://i.ibb.co/sdBRgSK3/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 256GB - Titanium Black","bc":"8806095830933"},{"s":"12GB / 512GB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 512GB - Titanium Black","bc":"8806095830896"},{"s":"12GB / 1TB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 1TB - Titanium Black","bc":"8806095830858"}]},"Titanium Silver Blue":{"img":"https://i.ibb.co/nMKtNnkz/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 256GB - Titanium Silver Blue","bc":"8806095889139"},{"s":"12GB / 512GB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 512GB - Titanium Silver Blue","bc":"8806095889092"},{"s":"12GB / 1TB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 1TB - Titanium Silver Blue","bc":"8806095889054"}]},"Titanium White Silver":{"img":"https://i.ibb.co/1GYQsXdS/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 256GB - Titanium White Silver","bc":"8806097015116"},{"s":"12GB / 512GB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 512GB - Titanium White Silver","bc":"8806097015055"},{"s":"12GB / 1TB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 1TB - Titanium White Silver","bc":"8806097022428"}]},"Titanium Gray":{"img":"https://i.ibb.co/8n2N9TwR/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 256GB - Titanium Gray","bc":"8806095888965"},{"s":"12GB / 512GB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 512GB - Titanium Gray","bc":"8806095889412"},{"s":"12GB / 1TB","name":"Galaxy S25 Ultra Dual SIM 5G 12GB - 1TB - Titanium Gray","bc":"8806095859880"}]}},"Galaxy S26 5G":{"Black":{"img":"https://i.ibb.co/w9gSL0z/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Dual SIM 5G 12GB - 256GB - Black","bc":"8806097869443"}]},"White":{"img":"https://i.ibb.co/jqkS7sW/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Dual SIM 5G 12GB - 256GB - White","bc":"8806097869382"}]},"Sky Blue":{"img":"https://i.ibb.co/ycRRSLHX/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Dual SIM 5G 12GB - 256GB - Sky Blue","bc":"8806097870043"}]},"Cobalt Violet":{"img":"https://i.ibb.co/236gTdsS/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Dual SIM 5G 12GB - 256GB - Cobalt Violet","bc":"8806097869986"}]}},"Galaxy S26 Plus 5G":{"Black":{"img":"https://i.ibb.co/jkdGG3HS/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Plus Dual SIM 5G 12GB - 256GB - Black","bc":"8806097864967"}]},"White":{"img":"https://i.ibb.co/xqMqZ69y/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Plus Dual SIM 5G 12GB - 256GB - White","bc":"8806097865285"}]},"Sky Blue":{"img":"https://i.ibb.co/C3t9BYXy/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Plus Dual SIM 5G 12GB - 256GB - Sky Blue","bc":"8806097865322"}]},"Cobalt Violet":{"img":"https://i.ibb.co/hR79xF9G/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Plus Dual SIM 5G 12GB - 256GB - Cobalt Violet","bc":"8806097865810"}]}},"Galaxy S26 Ultra 5G":{"Black":{"img":"https://i.ibb.co/XxJCQYhv/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Ultra Dual SIM 5G 12GB - 256GB - Black","bc":"8806097866473"},{"s":"12GB / 512GB","name":"Galaxy S26 Ultra Dual SIM 5G 12GB - 512GB - Black","bc":"8806097868255"},{"s":"16GB / 1TB","name":"Galaxy S26 Ultra Dual SIM 5G 16GB - 1TB - Black","bc":"8806097868071"}]},"White":{"img":"https://i.ibb.co/PvrLBv9B/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Ultra Dual SIM 5G 12GB - 256GB - White","bc":"8806097866374"},{"s":"12GB / 512GB","name":"Galaxy S26 Ultra Dual SIM 5G 12GB - 512GB - White","bc":"8806097868026"},{"s":"16GB / 1TB","name":"Galaxy S26 Ultra Dual SIM 5G 16GB - 1TB - White","bc":"8806097826842"}]},"Sky Blue":{"img":"https://i.ibb.co/M57kBjd5/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Ultra Dual SIM 5G 12GB - 256GB - Sky Blue","bc":"8806097867203"},{"s":"12GB / 512GB","name":"Galaxy S26 Ultra Dual SIM 5G 12GB - 512GB - Sky Blue","bc":"8806097867005"},{"s":"16GB / 1TB","name":"Galaxy S26 Ultra Dual SIM 5G 16GB - 1TB - Sky Blue","bc":"8806097827283"}]},"Cobalt Violet":{"img":"https://i.ibb.co/xqTfXnBy/1.jpg","variants":[{"s":"12GB / 256GB","name":"Galaxy S26 Ultra Dual SIM 5G 12GB - 256GB - Cobalt Violet","bc":"8806097867043"},{"s":"12GB / 512GB","name":"Galaxy S26 Ultra Dual SIM 5G 12GB - 512GB - Cobalt Violet","bc":"8806097866916"},{"s":"16GB / 1TB","name":"Galaxy S26 Ultra Dual SIM 5G 16GB - 1TB - Cobalt Violet","bc":"8806097866787"}]}}},"Infinix":{"Smart 10 4G":{"Sleek Black":{"img":"https://i.ibb.co/JfZ5b59/1.jpg","variants":[{"s":"3GB / 64GB","name":"Smart 10 Dual SIM 4G 3GB - 64GB - Sleek Black","bc":"4894947084485"},{"s":"4GB / 128GB","name":"Smart 10 Dual SIM 4G 4GB - 128GB - Sleek Black","bc":"4894947084423"}]},"Titanium Silver":{"img":"https://i.ibb.co/8nXxqFgY/1.jpg","variants":[{"s":"3GB / 64GB","name":"Smart 10 Dual SIM 4G 3GB - 64GB - Titanium Silver","bc":"4894947084447"},{"s":"4GB / 128GB","name":"Smart 10 Dual SIM 4G 4GB - 128GB - Titanium Silver","bc":"4894947084461"}]},"Iris Blue":{"img":"https://i.ibb.co/N6Ms6tK3/1.jpg","variants":[{"s":"3GB / 64GB","name":"Smart 10 Dual SIM 4G 3GB - 64GB - Iris Blue","bc":"4894947084485"},{"s":"4GB / 128GB","name":"Smart 10 Dual SIM 4G 4GB - 128GB - Iris Blue","bc":"4894947084508"}]},"Twilight Gold":{"img":"https://i.ibb.co/1GpWwyYR/1.jpg","variants":[{"s":"3GB / 64GB","name":"Smart 10 Dual SIM 4G 3GB - 64GB - Twilight Gold","bc":"4894947090912"},{"s":"4GB / 128GB","name":"Smart 10 Dual SIM 4G 4GB - 128GB - Twilight Gold","bc":"4894947090936"}]}},"Smart 20 4G":{"Shadow Black":{"img":"https://i.ibb.co/fVNdYSQH/1.jpg","variants":[{"s":"4GB / 64GB","name":"Smart 20 Dual SIM 4G 4GB - 64GB - Shadow Black","bc":"4894947122576"},{"s":"4GB / 128GB","name":"Smart 20 Dual SIM 4G 4GB - 128GB - Shadow Black","bc":"4894947122583"}]},"Polarise Titanium":{"img":"https://i.ibb.co/sdZjP7nw/1.jpg","variants":[{"s":"4GB / 64GB","name":"Smart 20 Dual SIM 4G 4GB - 64GB - Polaris Titanium","bc":"4894947122606"},{"s":"4GB / 128GB","name":"Smart 20 Dual SIM 4G 4GB - 128GB - Polaris Titanium","bc":"4894947122613"}]},"Cloudline Blue":{"img":"https://i.ibb.co/bMBSP9jf/1.jpg","variants":[{"s":"4GB / 64GB","name":"Smart 20 Dual SIM 4G 4GB - 64GB - Cloudline Blue","bc":"4894947122637"},{"s":"4GB / 128GB","name":"Smart 20 Dual SIM 4G 4GB - 128GB - Cloudline Blue","bc":"4894947122644"}]},"Sunlike Orange":{"img":"https://i.ibb.co/HDJjWS9x/1.jpg","variants":[{"s":"4GB / 64GB","name":"Smart 20 Dual SIM 4G 4GB - 64GB - Sunlike Orange","bc":"4894947116643"},{"s":"4GB / 128GB","name":"Smart 20 Dual SIM 4G 4GB - 128GB - Sunlike Orange","bc":"4894947116650"}]}},"Hot 60i 4G":{"Sleek Black":{"img":"https://i.ibb.co/Q7d3hBsc/1.jpg","variants":[{"s":"6GB / 128GB","name":"Hot 60i Dual SIM 4G 6GB - 128GB - Sleek Black","bc":"4894947093623"},{"s":"8GB / 256GB","name":"Hot 60i Dual SIM 4G 8GB - 256GB - Sleek Black","bc":"4894947093746"}]},"Titanium Silver":{"img":"https://i.ibb.co/spF0Yrc8/1.jpg","variants":[{"s":"6GB / 128GB","name":"Hot 60i Dual SIM 4G 6GB - 128GB - Titanium Silver","bc":"4894947093630"},{"s":"8GB / 256GB","name":"Hot 60i Dual SIM 4G 8GB - 256GB - Titanium Silver","bc":"4894947093753"}]},"Shadow Blue":{"img":"https://i.ibb.co/0jsCnqyt/1.jpg","variants":[{"s":"6GB / 128GB","name":"Hot 60i Dual SIM 4G 6GB - 128GB - Shadow Blue","bc":"4894947093647"},{"s":"8GB / 256GB","name":"Hot 60i Dual SIM 4G 8GB - 256GB - Shadow Blue","bc":"4894947093760"}]},"Neon Red":{"img":"https://i.ibb.co/xSCdtgys/1.jpg","variants":[{"s":"6GB / 128GB","name":"Hot 60i Dual SIM 4G 6GB - 128GB - Neon Red","bc":"4894947093654"},{"s":"8GB / 256GB","name":"Hot 60i Dual SIM 4G 8GB - 256GB - Neon Red","bc":"4894947093777"}]},"Meadow Green":{"img":"https://i.ibb.co/mrJGz7H2/1.jpg","variants":[{"s":"6GB / 128GB","name":"Hot 60i Dual SIM 4G 6GB - 128GB - Meadow Green","bc":"4894947093661"},{"s":"8GB / 256GB","name":"Hot 60i Dual SIM 4G 8GB - 256GB - Meadow Green","bc":"4894947093784"}]}},"Hot 60 5G":{"Sleek Black":{"img":"https://i.ibb.co/vCQ3KhG5/1.jpg","variants":[{"s":"6GB / 128GB","name":"Hot 60 Dual SIM 5G 6GB - 128GB - Sleek Black","bc":"4894947095016"}]},"Shadow Blue":{"img":"https://i.ibb.co/nqDv80Lg/1.jpg","variants":[{"s":"6GB / 128GB","name":"Hot 60 Dual SIM 5G 6GB - 128GB - Shadow Blue","bc":"4894947095054"}]},"Tundra Green":{"img":"https://i.ibb.co/ycc5Lt9N/1.jpg","variants":[{"s":"6GB / 128GB","name":"Hot 60 Dual SIM 5G 6GB - 128GB - Tundra Green","bc":"4894947095030"}]},"Caramel Glow":{"img":"https://i.ibb.co/JRbfvTKp/1.jpg","variants":[{"s":"6GB / 128GB","name":"Hot 60 Dual SIM 5G 6GB - 128GB - Caramel Glow","bc":"4894947095078"}]}},"Hot 60 Pro 4G":{"Sleek Black":{"img":"https://i.ibb.co/60BhwMyg/1.jpg","variants":[{"s":"8GB / 256GB","name":"Hot 60 Pro Dual SIM 4G 8GB - 256GB - Sleek Black","bc":"4894947093456"}]},"Titanium SIlver":{"img":"https://i.ibb.co/VYJqD5m3/1.jpg","variants":[{"s":"8GB / 256GB","name":"Hot 60 Pro Dual SIM 4G 8GB - 256GB - Titanium Silver","bc":"4894947093470"}]},"Coral Tides":{"img":"https://i.ibb.co/BR6byFm/1.jpg","variants":[{"s":"8GB / 256GB","name":"Hot 60 Pro Dual SIM 4G 8GB - 256GB - Coral Tides","bc":"4894947093494"}]},"Sapphire Blue":{"img":"https://i.ibb.co/rGWLszbQ/1.jpg","variants":[{"s":"8GB / 256GB","name":"Hot 60 Pro Dual SIM 4G 8GB - 256GB - Sapphire Blue","bc":"4894947093517"}]}},"Hot 60 Pro Plus 4G":{"Sleek Black":{"img":"https://i.ibb.co/9kbWcMv4/1.jpg","variants":[{"s":"8GB / 256GB","name":"Hot 60 Pro Plus Dual SIM 4G 8GB - 256GB - Sleek Black","bc":"4894947092565"}]},"Titanium Silver":{"img":"https://i.ibb.co/QFZDwQqM/1.jpg","variants":[{"s":"8GB / 256GB","name":"Hot 60 Pro Plus Dual SIM 4G 8GB - 256GB - Titanium Silver","bc":"4894947092596"}]},"Coral Tides":{"img":"https://i.ibb.co/WppCWdMF/1.jpg","variants":[{"s":"8GB / 256GB","name":"Hot 60 Pro Plus Dual SIM 4G 8GB - 256GB - Coral Tides","bc":"4894947092626"}]},"Sonic Yellow":{"img":"https://i.ibb.co/JwG1SsGK/1.jpg","variants":[{"s":"8GB / 256GB","name":"Hot 60 Pro Plus Dual SIM 4G 8GB - 256GB - Sonic Yellow","bc":"4894947092701"}]}},"Note 50s 5G":{"Titanium Grey":{"img":"https://i.ibb.co/Fk3BqDPn/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note 50s Dual SIM 5G 8GB - 256GB - Titanium Grey","bc":"4894947085987"}]},"Marine Drift":{"img":"https://i.ibb.co/B56z2YV5/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note 50s Dual SIM 5G 8GB - 256GB - Marine Drift","bc":"4894947086007"}]},"Mystic Plum":{"img":"https://i.ibb.co/Kcz7sNcF/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note 50s Dual SIM 5G 8GB - 256GB - Mystic Plum","bc":"4894947100260"}]},"Burgendy Red":{"img":"https://i.ibb.co/cchnddw7/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note 50s Dual SIM 5G 8GB - 256GB - Burgundy Red","bc":"4894947085994"}]}},"Note Edge 5G":{"Shadow Black":{"img":"https://i.ibb.co/xS4b4yCy/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note Edge Dual SIM 5G 8GB - 256GB - Shadow Black","bc":"4894947111150"}]},"Lunar Titanium":{"img":"https://i.ibb.co/C3jf8XzY/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note Edge Dual SIM 5G 8GB - 256GB - Lunar Titanium","bc":"4894947111242"}]},"Stellar Blue":{"img":"https://i.ibb.co/xttQrt1p/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note Edge Dual SIM 5G 8GB - 256GB - Stellar Blue","bc":"4894947111181"}]},"Silk Green":{"img":"https://i.ibb.co/k6s6mM18/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note Edge Dual SIM 5G 8GB - 256GB - Silk Green","bc":"4894947111211"}]}},"Note 60 5G":{"Midnight Black":{"img":"https://i.ibb.co/wh1PR5nB/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note 60 Dual SIM 5G 8GB - 256GB - Midnight Black","bc":"4894947114038"}]},"Mist Titanium":{"img":"https://i.ibb.co/GQqM2JPg/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note 60 Dual SIM 5G 8GB - 256GB - Mist Titanium","bc":"4894947114014"}]},"Fizz Blue":{"img":"https://i.ibb.co/RGcrm4Rb/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note 60 Dual SIM 5G 8GB - 256GB - Fizz Blue","bc":"4894947107757"}]},"Rose Gold":{"img":"https://i.ibb.co/h18R2LzR/1.jpg","variants":[{"s":"8GB / 256GB","name":"Note 60 Dual SIM 5G 8GB - 256GB - Rose Gold","bc":"4894947114076"}]}},"Note 60 Pro 5G":{"Mist Titanium":{"img":"https://i.ibb.co/XkVNmCyS/1.jpg","variants":[{"s":"12GB / 256GB","name":"Note 60 Pro Dual SIM 5G 12GB - 256GB - Mist Titanium","bc":""}]},"Deep Ocean Blue":{"img":"https://i.ibb.co/kV8591TT/1.jpg","variants":[{"s":"12GB / 256GB","name":"Note 60 Pro Dual SIM 5G 12GB - 256GB - Deep Ocean Blue","bc":""}]},"Solar Orange":{"img":"https://i.ibb.co/HTkMWQwy/1.jpg","variants":[{"s":"12GB / 256GB","name":"Note 60 Pro Dual SIM 5G 12GB - 256GB - Solar Orange","bc":""}]}},"GT 30 Pro 5G":{"Dark Flare":{"img":"https://i.ibb.co/F4kCfXb9/1.jpg","variants":[{"s":"12GB / 512GB","name":"GT 30 Pro Dual SIM 5G 12GB - 512GB - Dark Flare","bc":"4894947094613"}]}}},"Honor":{"X5c":{"Midnight Black":{"img":"https://i.ibb.co/SXNVwRXV/1.jpg","variants":[{"s":"4GB / 64GB","name":"X5c Dual SIM 4G 4GB - 64GB - Midnight Black","bc":"6936520877966"}]},"Tidal Blue":{"img":"https://i.ibb.co/hRHNq51G/1.jpg","variants":[{"s":"4GB / 64GB","name":"X5c Dual SIM 4G 4GB - 64GB - Tidal Blue","bc":"6936520877973"}]}},"X5c Plus":{"Midnight Black":{"img":"https://i.ibb.co/tT9Q11vw/1.jpg","variants":[{"s":"4GB / 128GB","name":"X5c Plus Dual SIM 4G 4GB - 128GB - Midnight Black","bc":"6936520878048"}]},"Ocean Cyan":{"img":"https://i.ibb.co/9mxs0Kz1/1.jpg","variants":[{"s":"4GB / 128GB","name":"X5c Plus Dual SIM 4G 4GB - 128GB - Ocean Cyan","bc":"6936520878055"}]}},"X6c 4G":{"Midnight Black":{"img":"https://i.ibb.co/tp2fKZmw/1.jpg","variants":[{"s":"6GB / 128GB","name":"X6c Dual SIM 4G 6GB - 128GB - Midnight Black","bc":"6936520869312"},{"s":"6GB / 256GB","name":"X6c Dual SIM 4G 6GB - 256GB - Midnight Black","bc":"6936520869565"}]},"Moonlight White":{"img":"https://i.ibb.co/qYnPqZfH/1.jpg","variants":[{"s":"6GB / 128GB","name":"X6c Dual SIM 4G 6GB - 128GB - Moonlight White","bc":"6936520869534"},{"s":"6GB / 256GB","name":"X6c Dual SIM 4G 6GB - 256GB - Moonlight White","bc":"6936520869589"}]},"Ocean Cyan":{"img":"https://i.ibb.co/vxQzsfnM/1.jpg","variants":[{"s":"6GB / 128GB","name":"X6c Dual SIM 4G 6GB - 128GB - Ocean Cyan","bc":"6936520875566"},{"s":"6GB / 256GB","name":"X6c Dual SIM 4G 6GB - 256GB - Ocean Cyan","bc":"6936520869572"}]}},"X7d 4G":{"Velvet Black":{"img":"https://i.ibb.co/gZRsPN4n/1.jpg","variants":[{"s":"8GB / 256GB","name":"X7d Dual SIM 4G 8GB - 256GB - Velvet Black","bc":"6936520877782"}]},"Meteor Silver":{"img":"https://i.ibb.co/kVrstgxy/1.jpg","variants":[{"s":"8GB / 256GB","name":"X7d Dual SIM 4G 8GB - 256GB - Meteor Silver","bc":"6936520877805"}]},"Desert Gold":{"img":"https://i.ibb.co/7tBS4YVv/1.jpg","variants":[{"s":"8GB / 256GB","name":"X7d Dual SIM 4G 8GB - 256GB - Desert Gold","bc":"6936520877799"}]}},"X7d 5G":{"Velvet Black":{"img":"https://i.ibb.co/gZRsPN4n/1.jpg","variants":[{"s":"8GB / 256GB","name":"X7d Dual SIM 5G 8GB - 256GB - Velvet Black","bc":"6936520876815"}]},"Meteor Silver":{"img":"https://i.ibb.co/kVrstgxy/1.jpg","variants":[{"s":"8GB / 256GB","name":"X7d Dual SIM 5G 8GB - 256GB - Meteor Silver","bc":"6936520876839"}]},"Desert Gold":{"img":"https://i.ibb.co/7tBS4YVv/1.jpg","variants":[{"s":"8GB / 256GB","name":"X7d Dual SIM 5G 8GB - 256GB - Desert Gold","bc":"6936520876822"}]}},"X8d 4G":{"Velvet Black":{"img":"https://i.ibb.co/qMpyfHTF/1.jpg","variants":[{"s":"8GB / 256GB","name":"X8d Dual SIM 4G 8GB - 256GB - Velvet Black","bc":"6936520886579"},{"s":"8GB / 512GB","name":"X8d Dual SIM 4G 8GB - 512GB - Velvet Black","bc":"6936520886630"}]},"Velvet Grey":{"img":"https://i.ibb.co/vGjcpPS/1.jpg","variants":[{"s":"8GB / 256GB","name":"X8d Dual SIM 4G 8GB - 256GB - Velvet Grey","bc":"6936520886586"},{"s":"8GB / 512GB","name":"X8d Dual SIM 4G 8GB - 512GB - Velvet Grey","bc":"6936520886647"}]},"Light Blue":{"img":"https://i.ibb.co/zH5j8bLg/1.jpg","variants":[{"s":"8GB / 256GB","name":"X8d Dual SIM 4G 8GB - 256GB - Light Blue","bc":"6936520886593"},{"s":"8GB / 512GB","name":"X8d Dual SIM 4G 8GB - 512GB - Light Blue","bc":"6936520886654"}]}},"X9d 5G":{"Midnight Black":{"img":"https://i.ibb.co/DPhfzYF4/1.jpg","variants":[{"s":"8GB / 256GB","name":"X9d Dual SIM 5G 8GB - 256GB - Midnight Black","bc":"6936520881031"},{"s":"12GB / 256GB","name":"X9d Dual SIM 5G 12GB - 256GB - Midnight Black","bc":"6936520881130"}]},"Sunrise Gold":{"img":"https://i.ibb.co/TyY05sv/1.jpg","variants":[{"s":"8GB / 256GB","name":"X9d Dual SIM 5G 8GB - 256GB - Sunrise Gold","bc":""},{"s":"12GB / 256GB","name":"X9d Dual SIM 5G 12GB - 256GB - Sunrise Gold","bc":"6936520881116"}]},"Reddish Brown":{"img":"https://i.ibb.co/99H0WsKw/1.jpg","variants":[{"s":"8GB / 256GB","name":"X9d Dual SIM 5G 8GB - 256GB - Reddish Brown","bc":"6936520881055"},{"s":"12GB / 256GB","name":"X9d Dual SIM 5G 12GB - 256GB - Reddish Brown","bc":"6936520881123"}]},"Forest Green":{"img":"https://i.ibb.co/hFY8T0zF/1.jpg","variants":[{"s":"8GB / 256GB","name":"X9d Dual SIM 5G 8GB - 256GB - Forest Green","bc":""},{"s":"12GB / 256GB","name":"X9d Dual SIM 5G 12GB - 256GB - Forest Green","bc":"6936520881109"}]}},"400 Lite 5G":{"Velvet Black":{"img":"https://i.ibb.co/jZV1m8FF/1.jpg","variants":[{"s":"8GB / 256GB","name":"400 Lite Dual SIM 5G 8GB - 256GB - Velvet Black","bc":"6936520867950"}]},"Velvet Grey":{"img":"https://i.ibb.co/Pz5RY99B/1.jpg","variants":[{"s":"8GB / 256GB","name":"400 Lite Dual SIM 5G 8GB - 256GB - Velvet Grey","bc":"6936520867943"}]},"Marrs Green":{"img":"https://i.ibb.co/7dhXWck1/1.jpg","variants":[{"s":"8GB / 256GB","name":"400 Lite Dual SIM 5G 8GB - 256GB - Marrs Green","bc":"6936520867936"}]}},"400 5G":{"Midnight Black":{"img":"https://i.ibb.co/fZL3Q20/1.jpg","variants":[{"s":"12GB / 256GB","name":"400 Dual SIM 5G 12GB - 256GB - Midnight Black","bc":"6936520869114"},{"s":"12GB / 512GB","name":"400 Dual SIM 5G 12GB - 512GB - Midnight Black","bc":"6936520869145"}]},"Meteor Silver":{"img":"https://i.ibb.co/zWsBH206/1.jpg","variants":[{"s":"12GB / 256GB","name":"400 Dual SIM 5G 12GB - 256GB - Meteor Silver","bc":"6936520869121"},{"s":"12GB / 512GB","name":"400 Dual SIM 5G 12GB - 512GB - Meteor Silver","bc":"6936520869152"}]},"Desert Gold":{"img":"https://i.ibb.co/Pz5RY99B/1.jpg","variants":[{"s":"12GB / 256GB","name":"400 Dual SIM 5G 12GB - 256GB - Desert Gold","bc":"6936520869138"},{"s":"12GB / 512GB","name":"400 Dual SIM 5G 12GB - 512GB - Desert Gold","bc":"6936520869169"}]}},"400 Pro 5G":{"Midnight Black":{"img":"https://i.ibb.co/jvsqhyBZ/1.jpg","variants":[{"s":"12GB / 512GB","name":"400 Pro Dual SIM 5G 12GB - 512GB - Midnight Black","bc":"6936520869220"}]},"Meteor Silver":{"img":"https://i.ibb.co/1JP8VGZc/1.jpg","variants":[{"s":"12GB / 512GB","name":"400 Pro Dual SIM 5G 12GB - 512GB - Meteor Silver","bc":"6936520869237"}]},"Tidal Blue":{"img":"https://i.ibb.co/j9bvr0Jp/1.jpg","variants":[{"s":"12GB / 512GB","name":"400 Pro Dual SIM 5G 12GB - 512GB - Tidal Blue","bc":"6936520869244"}]}},"600 Lite 5G":{"Velvet Black":{"img":"https://i.ibb.co/FL1L8hj4/1.jpg","variants":[{"s":"8GB / 256GB","name":"600 Lite Dual SIM 5G 8GB - 256GB - Velvet Black","bc":"6936520891542"}]},"Velvet Grey":{"img":"https://i.ibb.co/jPsHVdqP/1.jpg","variants":[{"s":"8GB / 256GB","name":"600 Lite Dual SIM 5G 8GB - 256GB - Velvet Grey","bc":"6936520891559"}]},"Sprout Green":{"img":"https://i.ibb.co/v4L96P8y/1.jpg","variants":[{"s":"8GB / 256GB","name":"600 Lite Dual SIM 5G 8GB - 256GB - Sprout Green","bc":"6936520891597"}]}},"600 5G":{"Black":{"img":"https://i.ibb.co/jZsfDXPC/1.jpg","variants":[{"s":"8GB / 256GB","name":"600 Dual SIM 5G 8GB - 256GB - Black","bc":"6936520899630"},{"s":"12GB / 256GB","name":"600 Dual SIM 5G 12GB - 256GB - Black","bc":"6936520899715"}]},"Orange":{"img":"https://i.ibb.co/HLKPmLkt/1.jpg","variants":[{"s":"8GB / 256GB","name":"600 Dual SIM 5G 8GB - 256GB - Orange","bc":"6936520899654"},{"s":"12GB / 256GB","name":"600 Dual SIM 5G 12GB - 256GB - Orange","bc":"6936520899739"}]},"Golden White":{"img":"https://i.ibb.co/hxZWgg4G/1.jpg","variants":[{"s":"8GB / 256GB","name":"600 Dual SIM 5G 8GB - 256GB - Golden White","bc":"6936520899647"},{"s":"12GB / 256GB","name":"600 Dual SIM 5G 12GB - 256GB - Golden White","bc":"6936520899722"}]}},"600 Pro 5G":{"Black":{"img":"https://i.ibb.co/XxpQ6q1G/1.jpg","variants":[{"s":"12GB / 512GB","name":"600 Pro Dual SIM 5G 12GB - 512GB - Black","bc":"6936520899814"}]},"Orange":{"img":"https://i.ibb.co/JfZ5b59/1.jpg","variants":[{"s":"12GB / 512GB","name":"600 Pro Dual SIM 5G 12GB - 512GB - Orange","bc":"6936520899838"}]},"Golden White":{"img":"https://i.ibb.co/wF440q8X/1.jpg","variants":[{"s":"12GB / 512GB","name":"600 Pro Dual SIM 5G 12GB - 512GB - Golden White","bc":"6936520899821"}]}}},"Xiaomi":{"Redmi A5 4G":{"Midnight Black":{"img":"https://i.ibb.co/9kLZFj4q/1.jpg","variants":[{"s":"4GB / 64GB","name":"Redmi A5 Dual SIM 4G 4GB - 64GB - Midnight Black","bc":"6932554433536"},{"s":"4GB / 128GB","name":"Redmi A5 Dual SIM 4G 4GB - 128GB - Midnight Black","bc":"6932554433567"}]},"Ocean Blue":{"img":"https://i.ibb.co/nsSRyMdH/1.jpg","variants":[{"s":"4GB / 64GB","name":"Redmi A5 Dual SIM 4G 4GB - 64GB - Ocean Blue","bc":"6932554433543"},{"s":"4GB / 128GB","name":"Redmi A5 Dual SIM 4G 4GB - 128GB - Ocean Blue","bc":"6932554425098"}]},"Sandy Gold":{"img":"https://i.ibb.co/5XvQ1nPL/1.jpg","variants":[{"s":"4GB / 64GB","name":"Redmi A5 Dual SIM 4G 4GB - 64GB - Sandy Gold","bc":"6932554433574"},{"s":"4GB / 128GB","name":"Redmi A5 Dual SIM 4G 4GB - 128GB - Sandy Gold","bc":"6932554433529"}]},"Lake Green":{"img":"https://i.ibb.co/5gWgGvSs/1.jpg","variants":[{"s":"4GB / 64GB","name":"Redmi A5 Dual SIM 4G 4GB - 64GB - Lake Green","bc":"6932554433512"},{"s":"4GB / 128GB","name":"Redmi A5 Dual SIM 4G 4GB - 128GB - Lake Green","bc":"6932554433581"}]}},"Redmi A7 Pro 4G":{"Black":{"img":"https://i.ibb.co/Swdt8jrr/1.jpg","variants":[{"s":"4GB / 64GB","name":"Redmi A7 Pro Dual SIM 4G 4GB - 64GB - Black","bc":"6932554496364"},{"s":"4GB / 128GB","name":"Redmi A7 Pro Dual SIM 4G 4GB - 128GB - Black","bc":"6932554496296"}]},"Mist Blue":{"img":"https://i.ibb.co/DgRX5r8V/1.jpg","variants":[{"s":"4GB / 64GB","name":"Redmi A7 Pro Dual SIM 4G 4GB - 64GB - Mist Blue","bc":"6932554496272"},{"s":"4GB / 128GB","name":"Redmi A7 Pro Dual SIM 4G 4GB - 128GB - Mist Blue","bc":"6932554496395"}]},"Palm Green":{"img":"https://i.ibb.co/7N4CGmp0/1.jpg","variants":[{"s":"4GB / 64GB","name":"Redmi A7 Pro Dual SIM 4G 4GB - 64GB - Palm Green","bc":"6932554496333"},{"s":"4GB / 128GB","name":"Redmi A7 Pro Dual SIM 4G 4GB - 128GB - Palm Green","bc":"6932554496302"}]},"Sunset Orange":{"img":"https://i.ibb.co/HDWbShXH/1.jpg","variants":[{"s":"4GB / 64GB","name":"Redmi A7 Pro Dual SIM 4G 4GB - 64GB - Sunset Orange","bc":"6932554496326"},{"s":"4GB / 128GB","name":"Redmi A7 Pro Dual SIM 4G 4GB - 128GB - Sunset Orange","bc":"6932554496371"}]}},"Redmi 15c 4G":{"Midnight Black":{"img":"https://i.ibb.co/hFChxtYr/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi 15c Dual SIM 4G 6GB - 128GB - Midnight Black","bc":"6932554456382"},{"s":"8GB / 256GB","name":"Redmi 15c Dual SIM 4G 8GB - 258GB - Midnight Black","bc":"6932554456399"}]},"Moonlight Blue":{"img":"https://i.ibb.co/xt9n2Hm4/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi 15c Dual SIM 4G 6GB - 128GB - Moonlight Blue","bc":"6932554456290"},{"s":"8GB / 256GB","name":"Redmi 15c Dual SIM 4G 8GB - 258GB - Moonlight Blue","bc":"6932554456306"}]},"Twilight Orange":{"img":"https://i.ibb.co/Lz098Q3h/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi 15c Dual SIM 4G 6GB - 128GB - Twilight Orange","bc":"6932554456320"},{"s":"8GB / 256GB","name":"Redmi 15c Dual SIM 4G 8GB - 258GB - Twilight Orange","bc":"6932554456344"}]},"Mint Green":{"img":"https://i.ibb.co/vvJHQv48/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi 15c Dual SIM 4G 6GB - 128GB - Mint Green","bc":"6932554456207"},{"s":"8GB / 256GB","name":"Redmi 15c Dual SIM 4G 8GB - 258GB - Mint Green","bc":"6932554456351"}]}},"Redmi 15 4G":{"Midnight Black":{"img":"https://i.ibb.co/HL9RVFKf/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi 15 Dual SIM 4G 6GB - 128GB - Midnight Black","bc":"6932554485252"},{"s":"8GB / 256GB","name":"Redmi 15 Dual SIM 4G 8GB - 258GB - Midnight Black","bc":"6932554485276"}]},"Sandy Purple":{"img":"https://i.ibb.co/v6VnGVvN/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi 15 Dual SIM 4G 6GB - 128GB - Sandy Purple","bc":"6932554485269"},{"s":"8GB / 256GB","name":"Redmi 15 Dual SIM 4G 8GB - 258GB - Sandy Purple","bc":"6932554485283"}]},"Titan Grey":{"img":"https://i.ibb.co/nN1c9XWz/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi 15 Dual SIM 4G 6GB - 128GB - Titan Grey","bc":"6932554485306"},{"s":"8GB / 256GB","name":"Redmi 15 Dual SIM 4G 8GB - 258GB - Titan Grey","bc":"6932554485290"}]}},"Redmi Note 15 4G":{"Black":{"img":"https://i.ibb.co/84Xcg5K3/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi Note 15 Dual SIM 4G 6GB - 128GB - Black","bc":"6932554495817"},{"s":"8GB / 256GB","name":"Redmi Note 15 Dual SIM 4G 8GB - 258GB - Black","bc":"6932554487317"}]},"Purple":{"img":"https://i.ibb.co/qFPTbkP7/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi Note 15 Dual SIM 4G 6GB - 128GB - Purple","bc":"6932554495800"},{"s":"8GB / 256GB","name":"Redmi Note 15 Dual SIM 4G 8GB - 258GB - Purple","bc":"6932554487225"}]},"Glacier Blue":{"img":"https://i.ibb.co/NnH4Nzqw/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi Note 15 Dual SIM 4G 6GB - 128GB - Glacier Blue","bc":"6932554495831"},{"s":"8GB / 256GB","name":"Redmi Note 15 Dual SIM 4G 8GB - 258GB - Glacier Blue","bc":"6932554487256"}]},"Forest Green":{"img":"https://i.ibb.co/B54Q2K55/1.jpg","variants":[{"s":"6GB / 128GB","name":"Redmi Note 15 Dual SIM 4G 6GB - 128GB - Forest Green","bc":"6932554495824"},{"s":"8GB / 256GB","name":"Redmi Note 15 Dual SIM 4G 8GB - 258GB - Forest Green","bc":"6932554487362"}]}},"Redmi Note 15 5G":{"Black":{"img":"https://i.ibb.co/JFM1mcbg/1.jpg","variants":[{"s":"8GB / 256GB","name":"Redmi Note 15 Dual SIM 5G 8GB - 256GB - Black","bc":"6932554492045"},{"s":"12GB / 512GB","name":"Redmi Note 15 Dual SIM 5G 12GB - 512GB - Black","bc":"6932554469269"}]},"Glacier Blue":{"img":"https://i.ibb.co/W47nRjz4/1.jpg","variants":[{"s":"8GB / 256GB","name":"Redmi Note 15 Dual SIM 5G 8GB - 256GB - Glacier Blue","bc":"6932554491987"},{"s":"12GB / 512GB","name":"Redmi Note 15 Dual SIM 5G 12GB - 512GB - Glacier Blue","bc":"6932554469689"}]},"Mist Pruple":{"img":"https://i.ibb.co/B2YX87ps/1.jpg","variants":[{"s":"8GB / 256GB","name":"Redmi Note 15 Dual SIM 5G 8GB - 256GB - Mist Purple","bc":"6932554469665"},{"s":"12GB / 512GB","name":"Redmi Note 15 Dual SIM 5G 12GB - 512GB - Mist Purple","bc":"6932554469276"}]}},"Redmi Note 15 Pro 5G":{"Black":{"img":"https://i.ibb.co/VpY8rMm4/1.jpg","variants":[{"s":"12GB / 256GB","name":"Redmi Note 15 Pro Dual SIM 5G 12GB - 256GB - Black","bc":"6932554471248"},{"s":"12GB / 512GB","name":"Redmi Note 15 Pro Dual SIM 5G 12GB - 512GB - Black","bc":"6932554471651"}]},"Glacier Blue":{"img":"https://i.ibb.co/60K66V2H/1.jpg","variants":[{"s":"12GB / 256GB","name":"Redmi Note 15 Pro Dual SIM 5G 12GB - 256GB - Glacier Blue","bc":"6932554470487"},{"s":"12GB / 512GB","name":"Redmi Note 15 Pro Dual SIM 5G 12GB - 512GB - Glacier Blue","bc":"6932554470616"}]},"Titanium":{"img":"https://i.ibb.co/8LKSsPYx/1.jpg","variants":[{"s":"12GB / 256GB","name":"Redmi Note 15 Pro Dual SIM 5G 12GB - 256GB - Titanium","bc":"6932554470470"},{"s":"12GB / 512GB","name":"Redmi Note 15 Pro Dual SIM 5G 12GB - 512GB - Titanium","bc":"6932554470104"}]}},"Redmi Note 15 Pro Plus 5G":{"Black":{"img":"https://i.ibb.co/DDFSvT2M/1.jpg","variants":[{"s":"12GB / 256GB","name":"Redmi Note 15 Pro Plus Dual SIM 5G 12GB - 256GB - Black","bc":"6932554490249"},{"s":"12GB / 512GB","name":"Redmi Note 15 Pro Plus Dual SIM 5G 12GB - 512GB - Black","bc":"6932554468002"}]},"Mocha Brown":{"img":"https://i.ibb.co/LDdPJ5ny/1.jpg","variants":[{"s":"12GB / 256GB","name":"Redmi Note 15 Pro Plus Dual SIM 5G 12GB - 256GB - Mocha Brown","bc":"6932554481889"},{"s":"12GB / 512GB","name":"Redmi Note 15 Pro Plus Dual SIM 5G 12GB - 512GB - Mocha Brown","bc":"6932554481834"}]},"Glacier Blue":{"img":"https://i.ibb.co/nsxy65zt/1.jpg","variants":[{"s":"12GB / 256GB","name":"Redmi Note 15 Pro Plus Dual SIM 5G 12GB - 256GB - Glacier Blue","bc":"6932554481926"},{"s":"12GB / 512GB","name":"Redmi Note 15 Pro Plus Dual SIM 5G 12GB - 512GB - Glacier Blue","bc":"6932554481704"}]}},"Poco C85 4G":{"Black":{"img":"https://i.ibb.co/vvcngnWM/1.jpg","variants":[{"s":"8GB / 256GB","name":"Poco C85 Dual SIM 4G 8GB - 256GB - Black","bc":"6932554459260"}]},"Purple":{"img":"https://i.ibb.co/qMgQ5Pk8/1.jpg","variants":[{"s":"8GB / 256GB","name":"Poco C85 Dual SIM 4G 8GB - 256GB - Purple","bc":"6932554459307"}]},"Green":{"img":"https://i.ibb.co/5g07yspw/1.jpg","variants":[{"s":"8GB / 256GB","name":"Poco C85 Dual SIM 4G 8GB - 256GB - Green","bc":"6932554459345"}]}}},"Oppo":{"A5i 4G":{"Starry Purple":{"img":"https://i.ibb.co/FqB25nc4/1.jpg","variants":[{"s":"4GB / 64GB","name":"A5i Dual SIM 4G 4GB - 64GB - Starry Purple","bc":"6932169378390"},{"s":"4GB / 128GB","name":"A5i Dual SIM 4G 4GB - 128GB - Starry Purple","bc":"6932169376525"}]},"Nebula Red":{"img":"https://i.ibb.co/HpkHF7kd/1.jpg","variants":[{"s":"4GB / 64GB","name":"A5i Dual SIM 4G 4GB - 64GB - Nebula Red","bc":"6932169378383"},{"s":"4GB / 128GB","name":"A5i Dual SIM 4G 4GB - 128GB - Nebula Red","bc":"6932169376518"}]}},"A5x 4G":{"Midnight Blue":{"img":"https://i.ibb.co/4nyLcbpT/1.jpg","variants":[{"s":"4GB / 128GB","name":"A5x Dual SIM 4G 4GB - 128GB - Midnight Blue","bc":"6932169370981"}]},"Laser White":{"img":"https://i.ibb.co/mCnCzknJ/1.jpg","variants":[{"s":"4GB / 128GB","name":"A5x Dual SIM 4G 4GB - 128GB - Laser White","bc":"6932169370998"}]}},"A5 4G":{"Aurora Green":{"img":"https://i.ibb.co/8Ld4HWwd/1.jpg","variants":[{"s":"6GB / 128GB","name":"A5 Dual SIM 4G 6GB - 128GB - Aurora Green","bc":"6932169373197"},{"s":"8GB / 256GB","name":"A5 Dual SIM 4G 8GB - 256GB - Aurora Green","bc":"6932169372923"}]},"Mist White":{"img":"https://i.ibb.co/nMnRGMgb/1.jpg","variants":[{"s":"6GB / 128GB","name":"A5 Dual SIM 4G 6GB - 128GB - Mist White","bc":"6932169373203"},{"s":"8GB / 256GB","name":"A5 Dual SIM 4G 8GB - 256GB - Mist White","bc":"6932169372930"}]}},"A5 Pro 4G":{"Mocha Brown":{"img":"https://i.ibb.co/DHZFWNw2/1.jpg","variants":[{"s":"8GB / 256GB","name":"A5 Pro Dual SIM 4G 8GB - 256GB - Mocha Brown","bc":"6932169364713"}]},"Olive Green":{"img":"https://i.ibb.co/s97PgSDv/1.jpg","variants":[{"s":"8GB / 256GB","name":"A5 Pro Dual SIM 4G 8GB - 256GB - Olive Green","bc":"6932169364720"}]}},"A6x 4G":{"Plum Purple":{"img":"https://i.ibb.co/7Nkxvn57/1.jpg","variants":[{"s":"4GB / 64GB","name":"A6x Dual SIM 4G 4GB - 64GB - Plum Purple","bc":"6932169389273"},{"s":"4GB / 128GB","name":"A6x Dual SIM 4G 4GB - 128GB - Plum Purple","bc":"6932169389310"}]},"Ice Blue":{"img":"https://i.ibb.co/KjtTDTwp/1.jpg","variants":[{"s":"4GB / 64GB","name":"A6x Dual SIM 4G 4GB - 64GB - Ice Blue","bc":"6932169389327"},{"s":"4GB / 128GB","name":"A6x Dual SIM 4G 4GB - 128GB - Ice Blue","bc":"6932169389303"}]}},"A6 4G":{"Aurora Gold":{"img":"https://i.ibb.co/vCwqFcLn/1.jpg","variants":[{"s":"4GB / 128GB","name":"A6 Dual SIM 4G 4GB - 128GB - Aurora Gold","bc":"6932169390910"},{"s":"6GB / 128GB","name":"A6 Dual SIM 4G 6GB - 128GB - Aurora Gold","bc":"6932169391047"},{"s":"8GB / 256GB","name":"A6 Dual SIM 4G 8GB - 256GB - Aurora Gold","bc":"6932169391061"}]},"Sapphire Blue":{"img":"https://i.ibb.co/PsNvP05S/1.jpg","variants":[{"s":"4GB / 128GB","name":"A6 Dual SIM 4G 4GB - 128GB - Sapphire Blue","bc":"6932169390903"},{"s":"6GB / 128GB","name":"A6 Dual SIM 4G 6GB - 128GB - Sapphire Blue","bc":"6932169391016"},{"s":"8GB / 256GB","name":"A6 Dual SIM 4G 8GB - 256GB - Sapphire Blue","bc":"6932169390712"}]}},"A6 Pro 4G":{"Stellar Blue":{"img":"https://i.ibb.co/RGpCNP7m/1.jpg","variants":[{"s":"8GB / 256GB","name":"A6 Pro Dual SIM 4G 8GB - 256GB - Stellar Blue","bc":"6932169380393"}]},"Rosewood Red":{"img":"https://i.ibb.co/CpmdDKZv/1.jpg","variants":[{"s":"8GB / 256GB","name":"A6 Pro Dual SIM 4G 8GB - 256GB - Rosewood Red","bc":"6932169380409"}]}},"A6 Pro 5G":{"Stellar Blue":{"img":"https://i.ibb.co/RGpCNP7m/1.jpg","variants":[{"s":"8GB / 256GB","name":"A6 Pro Dual SIM 5G 8GB - 256GB - Stellar Blue","bc":"6932169381529"}]},"Rosewood Red":{"img":"https://i.ibb.co/CpmdDKZv/1.jpg","variants":[{"s":"8GB / 256GB","name":"A6 Pro Dual SIM 5G 8GB - 256GB - Rosewood Red","bc":"6932169381451"}]}},"Reno 15f 5G":{"Twilight Blue":{"img":"https://i.ibb.co/Ngzmfr7n/1.jpg","variants":[{"s":"8GB / 256GB","name":"Reno 15f Dual SIM 5G 8GB - 256GB - Twilight Blue","bc":"6932169392877"},{"s":"12GB / 256GB","name":"Reno 15f Dual SIM 5G 12GB - 256GB - Twilight Blue","bc":"6932169392853"}]},"Aurora Blue":{"img":"https://i.ibb.co/qLJTRG55/1.jpg","variants":[{"s":"8GB / 256GB","name":"Reno 15f Dual SIM 5G 8GB - 256GB - Aurora Blue","bc":"6932169392860"},{"s":"12GB / 256GB","name":"Reno 15f Dual SIM 5G 12GB - 256GB - Aurora Blue","bc":"6932169394741"}]}},"Reno 15 5G":{"Twilight Blue":{"img":"https://i.ibb.co/4BdDWKg/1.jpg","variants":[{"s":"12GB / 256GB","name":"Reno 15 Dual SIM 5G 12GB - 256GB - Twilight Blue","bc":"6932169393287"},{"s":"12GB / 512GB","name":"Reno 15 Dual SIM 5G 12GB - 512GB - Twilight Blue","bc":"6932169393300"}]},"Aurora White":{"img":"https://i.ibb.co/wrWBQFx3/1.jpg","variants":[{"s":"12GB / 256GB","name":"Reno 15 Dual SIM 5G 12GB - 256GB - Aurora White","bc":"6932169393683"},{"s":"12GB / 512GB","name":"Reno 15 Dual SIM 5G 12GB - 512GB - Aurora White","bc":"6932169393881"}]}},"Reno 15 Pro 5G":{"Aurora Blue":{"img":"https://i.ibb.co/5ht9hm5X/1.jpg","variants":[{"s":"12GB / 512GB","name":"Reno 15 Pro Dual SIM 5G 12GB - 512GB - Aurora Blue","bc":"6932169387637"}]},"Dusk Brown":{"img":"https://i.ibb.co/Wpq97LS2/1.jpg","variants":[{"s":"12GB / 512GB","name":"Reno 15 Pro Dual SIM 5G 12GB - 512GB - Dusk Brown","bc":"6932169387644"}]}},"Find X9 Pro 5G":{"Titanium Charcoal":{"img":"https://i.ibb.co/0jcBVRJR/1.jpg","variants":[{"s":"16GB / 512GB","name":"Find X9 Pro Dual SIM 5G 16GB - 512GB - Titanium Charcoal","bc":"6932169386531"}]},"Silk White":{"img":"https://i.ibb.co/YF4c6S7W/1.jpg","variants":[{"s":"16GB / 512GB","name":"Find X9 Pro Dual SIM 5G 16GB - 512GB - Silk White","bc":"6932169386548"}]}}},"Realme":{"Note 60x 4G":{"Marble Black":{"img":"https://i.ibb.co/4wypZHZW/1.jpg","variants":[{"s":"3GB / 64GB","name":"Note 60x Dual SIM 4G 3GB - 64GB - Marble Black","bc":"6941764460287"},{"s":"4GB / 128GB","name":"Note 60x Dual SIM 4G 4GB - 128GB - Marble Black","bc":"6941764460300"}]},"Wilderness Green":{"img":"https://i.ibb.co/zVxWBVht/1.jpg","variants":[{"s":"3GB / 64GB","name":"Note 60x Dual SIM 4G 3GB - 64GB - Wilderness Green","bc":"6941764460270"},{"s":"4GB / 128GB","name":"Note 60x Dual SIM 4G 4GB - 128GB - Wilderness Green","bc":"6941764460294"}]}},"Note 70 4G":{"Obsidian Black":{"img":"https://i.ibb.co/RTJjLvmb/1.jpg","variants":[{"s":"4GB / 128GB","name":"Note 70 Dual SIM 4G 4GB - 128GB - Obsidian Black","bc":"6941764471276"}]},"Beach Gold":{"img":"https://i.ibb.co/fdnf7PrN/1.jpg","variants":[{"s":"4GB / 128GB","name":"Note 70 Dual SIM 4G 4GB - 128GB - Beach Gold","bc":"6941764471283"}]}},"C71 4G":{"Forest Owl":{"img":"https://i.ibb.co/7xkBJxYb/1.jpg","variants":[{"s":"4GB / 128GB","name":"C71 Dual SIM 4G 4GB - 128GB - Forest Owl","bc":"6941764466197"},{"s":"6GB / 128GB","name":"C71 Dual SIM 4G 6GB - 128GB - Forest Owl","bc":"6941764466135"}]},"White Swan":{"img":"https://i.ibb.co/wFptXYHm/1.jpg","variants":[{"s":"4GB / 128GB","name":"C71 Dual SIM 4G 4GB - 128GB - White Swan","bc":"6941764466203"},{"s":"6GB / 128GB","name":"C71 Dual SIM 4G 6GB - 128GB - White Swan","bc":"6941764466142"}]}},"C75x 4G":{"Oceanic Blue":{"img":"https://i.ibb.co/ksZyqwh6/1.jpg","variants":[{"s":"6GB / 128GB","name":"C75x Dual SIM 4G 6GB - 128GB - Oceanic Blue","bc":"6941764459304"},{"s":"8GB / 256GB","name":"C75x Dual SIM 4G 8GB - 256GB - Oceanic Blue","bc":"6941764459328"}]},"Coral Pink":{"img":"https://i.ibb.co/QF4hxshS/1.jpg","variants":[{"s":"6GB / 128GB","name":"C75x Dual SIM 4G 6GB - 128GB - Coral Pink","bc":"6941764459335"},{"s":"8GB / 256GB","name":"C75x Dual SIM 4G 8GB - 256GB - Coral Pink","bc":"6941764459359"}]}},"C85 4G":{"Swan Black":{"img":"https://i.ibb.co/3mtVzQzc/1.jpg","variants":[{"s":"8GB / 256GB","name":"C85 Dual SIM 4G 8GB - 256GB - Swan Black","bc":"6941764481282"}]},"Kingfisher Blue":{"img":"https://i.ibb.co/b5RztZbj/1.jpg","variants":[{"s":"8GB / 256GB","name":"C85 Dual SIM 4G 8GB - 256GB - Kingfisher Blue","bc":"6941764481275"}]}},"C85 Pro 4G":{"Peacock Green":{"img":"https://i.ibb.co/mryXhGb4/1.jpg","variants":[{"s":"8GB / 256GB","name":"C85 Pro Dual SIM 4G 8GB - 256GB - Peacock Green","bc":"6941764482715"}]},"Parrot Purple":{"img":"https://i.ibb.co/5P81LkR/1.jpg","variants":[{"s":"8GB / 256GB","name":"C85 Pro Dual SIM 4G 8GB - 256GB - Parrot Purple","bc":"6941764482722"}]}},"14T 5G":{"Obsidian Black":{"img":"https://i.ibb.co/VW4vjm2H/1.jpg","variants":[{"s":"8GB / 256GB","name":"14T Dual SIM 5G 8GB - 256GB - Obsidian Black","bc":"6941764460836"}]},"Lightning Purple":{"img":"https://i.ibb.co/XZLP7JZk/1.jpg","variants":[{"s":"8GB / 256GB","name":"14T Dual SIM 5G 8GB - 256GB - Lightning Purple","bc":"6941764460843"}]}},"14 5G":{"Storm Titanium":{"img":"https://i.ibb.co/ycdgVMd7/1.jpg","variants":[{"s":"12GB / 256GB","name":"14 Dual SIM 5G 12GB - 256GB - Storm Titanium","bc":"6941764459816"}]},"Mecha Silver":{"img":"https://i.ibb.co/hvH1vHr/1.jpg","variants":[{"s":"12GB / 256GB","name":"14 Dual SIM 5G 12GB - 256GB - Mecha Silver","bc":"6941764459878"}]}},"14 Pro 5G":{"Suede Grey":{"img":"https://i.ibb.co/XZpwd00n/1.jpg","variants":[{"s":"12GB / 256GB","name":"14 Pro Dual SIM 5G 12GB - 256GB - Suede Grey","bc":"6941764453975"}]},"Pearl White":{"img":"https://i.ibb.co/7dCwLK1m/1.jpg","variants":[{"s":"12GB / 256GB","name":"14 Pro Dual SIM 5G 12GB - 256GB - Pearl White","bc":"6941764453982"}]}},"14 Pro Plus 5G":{"Suede Grey":{"img":"https://i.ibb.co/6Jvs83w0/1.jpg","variants":[{"s":"12GB / 256GB","name":"14 Pro Plus Dual SIM 5G 12GB - 256GB - Suede Grey","bc":"6941764453104"}]},"Pearl White":{"img":"https://i.ibb.co/PZS2c5CW/1.jpg","variants":[{"s":"12GB / 256GB","name":"14 Pro Plus Dual SIM 5G 12GB - 256GB - Pearl White","bc":"6941764455061"}]}},"15T 5G":{"Suit Titanium":{"img":"https://i.ibb.co/xKrkX7pM/1.jpg","variants":[{"s":"8GB / 256GB","name":"15T Dual SIM 5G 8GB - 256GB - Suit Titanium","bc":"6941764480476"},{"s":"12GB / 256GB","name":"15T Dual SIM 5G 12GB - 256GB - Suit Titanium","bc":"6941764480490"}]},"Flowing Silver":{"img":"https://i.ibb.co/5Q7pB0q/1.jpg","variants":[{"s":"8GB / 256GB","name":"15T Dual SIM 5G 8GB - 256GB - Flowing Silver","bc":"6941764480483"},{"s":"12GB / 256GB","name":"15T Dual SIM 5G 12GB - 256GB - Flowing Silver","bc":"6941764480506"}]}},"15 5G":{"Suit Titanium":{"img":"https://i.ibb.co/99QrCJbC/1.jpg","variants":[{"s":"12GB / 256GB","name":"15 Dual SIM 5G 12GB - 256GB - Suit Titanium","bc":"6941764474222"}]},"Silk Pink":{"img":"https://i.ibb.co/WdJtSqh/1.jpg","variants":[{"s":"12GB / 256GB","name":"15 Dual SIM 5G 12GB - 256GB - Silk Pink","bc":"6941764474239"}]}},"15 Pro 5G":{"Velvet Green":{"img":"https://i.ibb.co/dwg27fg1/1.jpg","variants":[{"s":"12GB / 256GB","name":"15 Pro Dual SIM 5G 12GB - 256GB - Velvet Green","bc":"6941764473829"}]},"Flowing Silver":{"img":"https://i.ibb.co/fzVB0LZw/1.jpg","variants":[{"s":"12GB / 256GB","name":"15 Pro Dual SIM 5G 12GB - 256GB - Flowing Silver","bc":"6941764473812"}]}}},"Vivo":{"Y04 4G":{"Titanium Gold":{"img":"https://i.ibb.co/8gW0PBDz/1.jpg","variants":[{"s":"4GB / 64GB","name":"Y04 Dual SIM 4G 4GB - 64GB - Titanium Gold","bc":"6935117898148"},{"s":"4GB / 128GB","name":"Y04 Dual SIM 4G 4GB - 128GB - Titanium Gold","bc":"6935117898292"},{"s":"4GB / 256GB","name":"Y04 Dual SIM 4G 4GB - 256GB - Titanium Gold","bc":"6932204509062"}]},"Dark Green":{"img":"https://i.ibb.co/TqwVfN1L/1.jpg","variants":[{"s":"4GB / 64GB","name":"Y04 Dual SIM 4G 4GB - 64GB - Dark Green","bc":"6935117898285"},{"s":"4GB / 128GB","name":"Y04 Dual SIM 4G 4GB - 128GB - Dark Green","bc":"6935117898230"},{"s":"4GB / 256GB","name":"Y04 Dual SIM 4G 4GB - 256GB - Dark Green","bc":"6932204509079"}]}},"Y05 4G":{"Summit Platinum":{"img":"https://i.ibb.co/gZ2Vtqcz/1.jpg","variants":[{"s":"4GB / 64GB","name":"Y05 Dual SIM 4G 4GB - 64GB - Summit Platinum","bc":"6221355100434"},{"s":"4GB / 128GB","name":"Y05 Dual SIM 4G 4GB - 128GB - Summit Platinum","bc":"6221355100410"}]},"Voyage Black":{"img":"https://i.ibb.co/4Z31swx5/1.jpg","variants":[{"s":"4GB / 64GB","name":"Y05 Dual SIM 4G 4GB - 64GB - Voyage Black","bc":"6221355100403"},{"s":"4GB / 128GB","name":"Y05 Dual SIM 4G 4GB - 128GB - Voyage Black","bc":"6221355100427"}]}},"Y21D 4G":{"Jade Green":{"img":"https://i.ibb.co/XZYyNLtz/1.jpg","variants":[{"s":"4GB / 128GB","name":"Y21D Dual SIM 4G 4GB - 128GB - Jade Green","bc":"6221355082785"},{"s":"6GB / 128GB","name":"Y21D Dual SIM 4G 6GB - 128GB - Jade Green","bc":"6221355082471"},{"s":"6GB / 256GB","name":"Y21D Dual SIM 4G 6GB - 256GB - Jade Green","bc":"6221355082693"}]},"Coral Red":{"img":"https://i.ibb.co/cGQ8n27/1.jpg","variants":[{"s":"4GB / 128GB","name":"Y21D Dual SIM 4G 4GB - 128GB - Coral Red","bc":"6221355082792"},{"s":"6GB / 128GB","name":"Y21D Dual SIM 4G 6GB - 128GB - Coral Red","bc":"6221355082464"},{"s":"6GB / 256GB","name":"Y21D Dual SIM 4G 6GB - 256GB - Coral Red","bc":"6221355082686"}]}},"Y31D 4G":{"Gray":{"img":"https://i.ibb.co/BHHFxbFF/1.jpg","variants":[{"s":"6GB / 128GB","name":"Y31D Dual SIM 4G 6GB - 128GB - Gray","bc":"6221355100281"},{"s":"8GB / 128GB","name":"Y31D Dual SIM 4G 8GB - 128GB - Gray","bc":"6221355100229"},{"s":"8GB / 256GB","name":"Y31D Dual SIM 4G 8GB - 256GB - Gray","bc":"6221355100090"}]},"Gold":{"img":"https://i.ibb.co/20BNd9x8/1.jpg","variants":[{"s":"6GB / 128GB","name":"Y31D Dual SIM 4G 6GB - 128GB - Gold","bc":"6221355100519"},{"s":"8GB / 128GB","name":"Y31D Dual SIM 4G 8GB - 128GB - Gold","bc":"6221355100502"},{"s":"8GB / 256GB","name":"Y31D Dual SIM 4G 8GB - 256GB - Gold","bc":"6221355100526"}]}},"Y29 4G":{"Elegant White":{"img":"https://i.ibb.co/5xKyVj17/1.jpg","variants":[{"s":"8GB / 128GB","name":"Y29 Dual SIM 4G 8GB - 128GB - Elegant White","bc":"6935117897233"},{"s":"8GB / 256GB","name":"Y29 Dual SIM 4G 8GB - 256GB - Elegant White","bc":"6935117897301"}]},"Noble Brown":{"img":"https://i.ibb.co/C5m985vD/1.jpg","variants":[{"s":"8GB / 128GB","name":"Y29 Dual SIM 4G 8GB - 128GB - Noble Brown","bc":"6935117897295"},{"s":"8GB / 256GB","name":"Y29 Dual SIM 4G 8GB - 256GB - Noble Brown","bc":"6935117897240"}]}},"V60 Lite 4G":{"Elegeant Black":{"img":"https://i.ibb.co/TdH7SGd/1.jpg","variants":[{"s":"8GB / 256GB","name":"V60 Lite Dual SIM 4G 8GB - 256GB - Elegant Black","bc":"6221355082440"}]},"Titanium Blue":{"img":"https://i.ibb.co/WpxZXtpJ/1.jpg","variants":[{"s":"8GB / 256GB","name":"V60 Lite Dual SIM 4G 8GB - 256GB - Titanium Blue","bc":"6221355082457"}]}},"V60 Lite 5G":{"Elegeant Black":{"img":"https://i.ibb.co/TdH7SGd/1.jpg","variants":[{"s":"8GB / 256GB","name":"V60 Lite Dual SIM 5G 8GB - 256GB - Elegant Black","bc":"6221355100014"},{"s":"12GB / 256GB","name":"V60 Lite Dual SIM 5G 12GB - 256GB - Elegant Black","bc":"6221355100014"}]},"Titanium Blue":{"img":"https://i.ibb.co/WpxZXtpJ/1.jpg","variants":[{"s":"8GB / 256GB","name":"V60 Lite Dual SIM 5G 8GB - 256GB - Titanium Blue","bc":"6221355100038"},{"s":"12GB / 256GB","name":"V60 Lite Dual SIM 5G 12GB - 256GB - Titanium Blue","bc":"6221355100021"}]}},"V60 5G":{"Mist Grey":{"img":"https://i.ibb.co/N6vn3jgs/1.jpg","variants":[{"s":"12GB / 256GB","name":"V60 Dual SIM 5G 12GB - 256GB - Mist Grey","bc":"6221355082549"},{"s":"12GB / 512GB","name":"V60 Dual SIM 5G 12GB - 512GB - Mist Grey","bc":"6221355082549"}]},"Asupicious Gold":{"img":"https://i.ibb.co/WW0cx6k7/1.jpg","variants":[{"s":"12GB / 256GB","name":"V60 Dual SIM 5G 12GB - 256GB - Asupicious Gold","bc":"6221355082525"},{"s":"12GB / 512GB","name":"V60 Dual SIM 5G 12GB - 512GB - Asupicious Gold","bc":"6221355082556"}]}},"V70 FE 5G":{"Ocean Blue":{"img":"https://i.ibb.co/bMvvDqM2/1.jpg","variants":[{"s":"8GB / 256GB","name":"V70 FE Dual SIM 5G 8GB - 256GB - Ocean Blue","bc":"6221355100212"},{"s":"12GB / 256GB","name":"V70 FE Dual SIM 5G 12GB - 256GB - Ocean Blue","bc":"6221355100205"}]},"Titanium Silver":{"img":"https://i.ibb.co/jvwg74vM/1.jpg","variants":[{"s":"8GB / 256GB","name":"V70 FE Dual SIM 5G 8GB - 256GB - Titanium Silver","bc":"6221355100243"},{"s":"12GB / 256GB","name":"V70 FE Dual SIM 5G 12GB - 256GB - Titanium Silver","bc":"6221355100250"}]}},"V70 5G":{"Dune Gray":{"img":"https://i.ibb.co/n86Bcn15/1.jpg","variants":[{"s":"12GB / 256GB","name":"V70 Dual SIM 5G 12GB - 256GB - Dune Gray","bc":"6221355100342"}]},"Matte Brown":{"img":"https://i.ibb.co/6ctC3LPP/1.jpg","variants":[{"s":"12GB / 256GB","name":"V70 Dual SIM 5G 12GB - 256GB - Matte Brown","bc":"6221355100359"}]}},"X300 Pro 5G":{"Phantom Black":{"img":"https://i.ibb.co/qYbdDqp2/1.jpg","variants":[{"s":"16GB / 512GB","name":"X300 Pro Dual SIM 5G 16GB - 512GB - Phantom Black","bc":"6932204510181"}]},"Dune Brown":{"img":"https://i.ibb.co/ZzJsXZZ0/1.jpg","variants":[{"s":"16GB / 512GB","name":"X300 Pro Dual SIM 5G 16GB - 512GB - Dune Brown","bc":"6932204513243"}]}}},"Motorola":{"G35 5G":{"Midnight Black":{"img":"https://i.ibb.co/vv3HrfHS/1.jpg","variants":[{"s":"8GB / 256GB","name":"G35 Dual SIM 5G 8GB - 256GB - Midnight Black","bc":"840023275074"}]},"Guava Red":{"img":"https://i.ibb.co/27RDCYhk/1.jpg","variants":[{"s":"8GB / 256GB","name":"G35 Dual SIM 5G 8GB - 256GB - Guava Red","bc":"840023275081"}]},"Leaf Green":{"img":"https://i.ibb.co/XxJzJDjD/1.jpg","variants":[{"s":"8GB / 256GB","name":"G35 Dual SIM 5G 8GB - 256GB - Leaf Green","bc":"840023275098"}]}},"G56 5G":{"Pantone Black Oyster":{"img":"https://i.ibb.co/B5hqJv9M/1.jpg","variants":[{"s":"12GB / 256GB","name":"G56 Dual SIM 5G 12GB - 256GB - Pantone Black Oyster","bc":"840023297021"}]},"Pantone Gray Mist":{"img":"https://i.ibb.co/0706NP8/1.jpg","variants":[{"s":"12GB / 256GB","name":"G56 Dual SIM 5G 12GB - 256GB - Pantone Gray Mist","bc":"840493602790"}]},"Pantone Dill":{"img":"https://i.ibb.co/1fsytmB9/1.jpg","variants":[{"s":"12GB / 256GB","name":"G56 Dual SIM 5G 12GB - 256GB - Pantone Dill","bc":"840023297014"}]},"Pantone Dazzling Blue":{"img":"https://i.ibb.co/DDvdgr76/1.jpg","variants":[{"s":"12GB / 256GB","name":"G56 Dual SIM 5G 12GB - 256GB - Pantone Dazzling Blue","bc":"840023297038"}]}},"Edge 60 Fusion 5G":{"Pantone Slipstream":{"img":"https://i.ibb.co/JWgn5D6L/1.jpg","variants":[{"s":"12GB / 256GB","name":"Edge 60 Fusion Dual SIM 5G 12GB - 256GB - Pantone Slipstream \"Grey\"","bc":"840023287961"}]},"Patnone Amazonite":{"img":"https://i.ibb.co/0jJCh99g/1.jpg","variants":[{"s":"12GB / 256GB","name":"Edge 60 Fusion Dual SIM 5G 12GB - 256GB - Pantone Amazonite \"Blue\"","bc":"840023287978"}]},"Pantone Zephyr":{"img":"https://i.ibb.co/rRpJhkZg/1.jpg","variants":[{"s":"12GB / 256GB","name":"Edge 60 Fusion Dual SIM 5G 12GB - 256GB - Pantone Zephyr \"Pink\"","bc":"840023287985"}]}},"Edge 60 5G":{"Pantone Glibraltar Sea":{"img":"https://i.ibb.co/y9728P9/1.jpg","variants":[{"s":"12GB / 512GB","name":"Edge 60 Dual SIM 5G 12GB - 512GB - Pantone Gibraltar Sea \"Dark Blue\"","bc":"840023287183"}]},"Pantone Shamrock":{"img":"https://i.ibb.co/BK5TQ0q0/1.jpg","variants":[{"s":"12GB / 512GB","name":"Edge 60 Dual SIM 5G 12GB - 512GB - Pantone Shamrock \"Green\"","bc":"840023287190"}]}},"Edge 60 Pro 5G":{"Pantone Dazzling Blue":{"img":"https://i.ibb.co/S4RcXSry/1.jpg","variants":[{"s":"12GB / 512GB","name":"Edge 60 Pro Dual SIM 5G 12GB - 512GB - Pantone Dazzling Blue","bc":"840023296291"}]},"Pantone Shadow":{"img":"https://i.ibb.co/RGt3gxbK/1.jpg","variants":[{"s":"12GB / 512GB","name":"Edge 60 Pro Dual SIM 5G 12GB - 512GB - Pantone Shadow \"Grey\"","bc":"840023296284"}]},"Pantone Sparkling Grape":{"img":"https://i.ibb.co/BK7Dvr1m/1.jpg","variants":[{"s":"12GB / 512GB","name":"Edge 60 Pro Dual SIM 5G 12GB - 512GB - Pantone Sparkling Grape \"Purple\"","bc":"840023296307"}]}}}};
+var famState={brand:"",fam:"",sel:{},country:"",warranty:""};
+function $(id){return document.getElementById(id);}
+
+function nodeAt(p){ // returns the options object at a given path level
+  if(p.length===0) return TREE;
+  if(p.length===1) return TREE[p[0]].children;
+  return null; // deepest level reached (e.g. Phones>Android)
+}
+function playReveal(el){ el.classList.remove("reveal"); void el.offsetWidth; el.classList.add("reveal"); }
+function scrollC(el){ if(!el)return; setTimeout(function(){ try{el.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){} },90); }
+function render(){
+  var line=$("line"); line.innerHTML="";
+  // breadcrumb chips on their own row
+  var crumbs=document.createElement("div");crumbs.className="crumbs";
+  path.forEach(function(label,i){
+    var isBrand=(i===2);
+    var c=document.createElement("div");c.className="crumb"+((i===path.length-1 && fwdNav)?" cnew":"")+(isBrand?" locked":"");
+    c.innerHTML='<span>'+label+'</span>'+(isBrand?'':'<span class="x">&#10005;</span>');
+    if(!isBrand){ c.onclick=function(){ path=path.slice(0,i); render(); scrollC($("navCard")); }; } // tap chip = go back to that level
+    crumbs.appendChild(c);
+    if(i<path.length-1){var ar=document.createElement("span");ar.className="arrow";ar.textContent="\u2192";crumbs.appendChild(ar);}
+  });
+  if(path.length) line.appendChild(crumbs);
+  // options at current level (if any) — inline on the same line
+  var opts=nodeAt(path);
+  if(opts){
+    if(path.length){var sep=document.createElement("span");sep.className="arrow";sep.textContent="\u2192";line.appendChild(sep);}
+    var grid=document.createElement("div");grid.className="opts";
+    Object.keys(opts).forEach(function(label){
+      var meta=opts[label];
+      var active = (path.length===0) ? true : !!meta.active; // mains all clickable
+      var b=document.createElement("div");
+      b.className="opt"+(active?"":" off");
+      b.textContent=label;
+      if(active) b.onclick=function(){ fwdNav=true; path.push(label); render(); };
+      grid.appendChild(b);
+    });
+    line.appendChild(grid);
+  } else {
+    // deepest: remove trailing arrow, show we've arrived
+    if(line.lastChild && line.lastChild.className==="arrow") line.removeChild(line.lastChild);
+  }
+  // ---- Android brand sub-row OR iOS direct-to-families ----
+  var atAndroid = path.length===2 && path[0]==="Phones" && path[1]==="Android";
+  var atApple   = path.length===2 && path[0]==="Phones" && path[1]==="iOS";
+  var hasBrand  = path.length>=3 || atApple;
+  if(atAndroid){
+    var bb=$("brands");bb.innerHTML="";
+    BRANDS.forEach(function(br){
+      var b=document.createElement("div");b.className="opt";b.textContent=br;
+      b.onclick=function(){ fwdNav=true; path.push(br); render(); scrollC($("famCard")); };
+      bb.appendChild(b);
+    });
+    $("brandbar").classList.remove("hidden");
+  } else {
+    $("brandbar").classList.add("hidden");
+  }
+  if(atApple){ loadiOSCatalog(); }
+  // ---- Family card ----
+  if(hasBrand){
+    var curBrand = atApple ? "Apple" : (path[2]||"");
+    if(famState.brand!==curBrand){famState.brand=curBrand;famState.fam="";famState.sel={};famState.country="";famState.warranty="";}
+    var fc=$("famCard"); if(fc.classList.contains("hidden")){ fc.classList.remove("hidden"); playReveal(fc); }
+    if(!famState.fam) renderFamGrid(); else renderFamilyDetail();
+  } else {
+    $("famCard").classList.add("hidden");
+    famState.brand="";famState.fam="";famState.sel={};famState.country="";famState.warranty="";
+  }
+  // titles + reset
+  $("title").textContent = path.length===0?"Select Main Category":(path.length===1?"Select Category":(path.length===2?"Select Brand":"Category"));
+  $("reset").style.visibility = path.length?"visible":"hidden";
+  fwdNav=false;
+}
+function fThumb(u){if(!u)return "";var pa;try{pa=new URL(u).pathname;}catch(e){pa=u;}pa=pa.replace(/\.[^.\/]+$/,"");var slug=pa.replace(/^\/+/,"").replace(/\//g,"_");return "https://vxscfljgtmddnmzmwitq.supabase.co/storage/v1/object/public/thumbs/"+slug+".webp";}
+function findVariant(name){
+  var colors=(ADATA[path[2]]&&ADATA[path[2]][famState.fam])||{};
+  var found=null;
+  Object.keys(colors).forEach(function(col){colors[col].variants.forEach(function(v){if(v.name===name)found=v;});});
+  return found;
+}
+function renderFamGrid(){
+  $("fams").classList.remove("hidden");$("famDetail").classList.add("hidden");
+  $("famBack").classList.add("hidden");$("famClear").classList.add("hidden");$("famTitle").textContent="Select Model Family";
+  var fg=$("fams");fg.innerHTML="";
+  if(famState.brand==="Apple"){
+    fg.style.display="block";
+    if(!iosLoaded||!IOS_FAMS.length){var p=document.createElement("p");p.style.cssText="color:var(--dim);text-align:center;padding:30px";p.textContent="Loading iPhone catalog...";fg.appendChild(p);return;}
+    var groups={};
+    IOS_FAMS.forEach(function(f){var g=genOf(f);(groups[g]=groups[g]||[]).push(f);});
+    Object.keys(groups).sort(function(a,b){return a-b;}).forEach(function(g){
+      groups[g].sort(function(a,b){return famRank(a)-famRank(b);});
+      var row=document.createElement("div");row.className="famserie";
+      groups[g].forEach(function(f){
+        var b=document.createElement("div");b.className="opt";b.textContent=f;
+        b.onclick=function(){famState.fam=f;famState.sel={};famState.justOpened=true;renderFamilyDetail();scrollC($("famCard"));};
+        row.appendChild(b);
+      });
+      fg.appendChild(row);
+    });
+  } else {
+    fg.style.display="";
+    (SAMPLE_FAMS[famState.brand]||[]).forEach(function(f){
+      var b=document.createElement("div");b.className="opt";b.textContent=f;
+      b.onclick=function(){famState.fam=f;famState.sel={};famState.justOpened=true;renderFamilyDetail();scrollC($("famCard"));};
+      fg.appendChild(b);
+    });
+  }
+}
+function renderFamilyDetail(){
+  if(imgCacheFam!==famState.fam){ imgCache={}; imgCacheFam=famState.fam; }
+  $("fams").classList.add("hidden");var fd=$("famDetail");var wasHidden=fd.classList.contains("hidden");fd.classList.remove("hidden");if(wasHidden)playReveal(fd);
+  if(famState.justOpened){ fd.classList.add("anim"); famState.justOpened=false; setTimeout(function(){fd.classList.remove("anim");},900); }
+  $("famBack").classList.remove("hidden");$("famTitle").textContent=famState.fam;
+  var hasSel=Object.keys(famState.sel).length>0;
+  $("famClear").classList.toggle("hidden",!hasSel);
+  if(!hasSel){famClearArmed=false;$("famClear").innerHTML="&#128465; Clear all";}
+  var brand=famState.brand, colors=(brand==="Apple"?(IOS_ADATA[famState.fam]||{}):(ADATA[brand]&&ADATA[brand][famState.fam])||{});
+  var d=$("famDetail");d.innerHTML="";
+  var row=document.createElement("div");row.className="colorrow";
+  Object.keys(colors).forEach(function(col){
+    var c=colors[col];
+    var colDiv=document.createElement("div");colDiv.className="colorcol";
+    var box=document.createElement("div");box.className="colorimg";
+    var imgEl=imgCache[c.img];
+    if(!imgEl){
+      var im=fThumb(c.img);
+      imgEl=document.createElement("img");imgEl.loading="lazy";imgEl.decoding="async";imgEl.src=im;
+      imgEl.onerror=function(){this.onerror=null;this.src=c.img;};
+      imgCache[c.img]=imgEl;
+    }
+    box.appendChild(imgEl);
+    colDiv.appendChild(box);
+    var nm=document.createElement("div");nm.className="colorname";nm.textContent=col;colDiv.appendChild(nm);
+    // per-colour Select All (same style as Change family / Done)
+    var allBtn=document.createElement("button");allBtn.className="reset";
+    allBtn.style.cssText="display:block;width:100%;margin-bottom:10px;font-size:12px;padding:7px 10px";
+    var selectable=c.variants.filter(function(v){return !inQueue(v.name);});
+    var allOn=selectable.length>0 && selectable.every(function(v){return famState.sel[v.name];});
+    allBtn.textContent=allOn?"\u2713 Deselect all":"Select all storages";
+    if(!selectable.length){allBtn.style.opacity=".5";allBtn.style.cursor="not-allowed";}
+    allBtn.onclick=function(){
+      if(!selectable.length) return;
+      if(allOn){ selectable.forEach(function(v){delete famState.sel[v.name];}); }
+      else { selectable.forEach(function(v){ if(!famState.sel[v.name]) famState.sel[v.name]={barcode:"",sku:""}; }); }
+      renderFamilyDetail();
+    };
+    colDiv.appendChild(allBtn);
+    var st=document.createElement("div");st.className="stbox";
+    c.variants.forEach(function(v){
+      var key=v.name,added=inQueue(key),sel=famState.sel[key],on=!!sel,noBC=!v.bc;
+      var sr=document.createElement("div");sr.className="strow"+(added?" added":(on?" on":""));
+      sr.innerHTML='<div class="cb">'+((added||on)?"\u2713":"")+'</div><span></span>';
+      sr.querySelector("span").textContent=v.s+(added?"  \u00b7 Added":"");
+      if(added){ sr.title="Already in your queue"; }
+      else { sr.onclick=function(){ if(famState.sel[key])delete famState.sel[key]; else { famState.sel[key]= famState.brand==="Apple" ? {sim:"",facetime:"",region:"",country:"",warranty:"",barcode:"",sku:""} : {barcode:"",sku:""}; } renderFamilyDetail(); }; }
+      st.appendChild(sr);
+      if(on && !added){
+        var f=document.createElement("div");f.className="stfields";
+        if(famState.brand==="Apple"){
+          // iOS expanded row: SIM / FaceTime / Region (trio) then Country/Warranty (cw) then Barcode/SKU
+          var cell=function(labelText,required){var d=document.createElement("div");var l=document.createElement("label");l.className="flab"+(required?" req":"");l.textContent=labelText;d.appendChild(l);return d;};
+          var trio=document.createElement("div");trio.className="triogrid";
+          var c1=cell("SIM Type *",true);
+          var simSel=document.createElement("select");simSel.className="psel";
+          simSel.innerHTML='<option value="">Choose...</option>'+SIM_LIST.map(function(x){return '<option'+(sel.sim===x?" selected":"")+'>'+x+'</option>';}).join("");
+          simSel.style.borderColor=sel.sim?"var(--green)":"var(--danger)";
+          simSel.onchange=function(){sel.sim=simSel.value;sel.facetime="";renderFamilyDetail();};
+          c1.appendChild(simSel);trio.appendChild(c1);
+          var c2=cell("FaceTime *",true);
+          var ftSel=document.createElement("select");ftSel.className="psel";
+          if(sel.sim){
+            var FT=[["FaceTime Supported","Supported"],["FaceTime Not Supported","Not Supported"]];
+            ftSel.innerHTML='<option value="">Choose...</option>'+FT.map(function(x){return '<option value="'+x[0]+'"'+(sel.facetime===x[0]?" selected":"")+'>'+x[1]+'</option>';}).join("");
+            ftSel.style.borderColor=sel.facetime?"var(--green)":"var(--danger)";
+            ftSel.onchange=function(){sel.facetime=ftSel.value;renderFamilyDetail();};
+          } else { ftSel.innerHTML='<option>Choose SIM first</option>';ftSel.disabled=true; }
+          c2.appendChild(ftSel);trio.appendChild(c2);
+          var c3=cell("Region / Version *",true);
+          var regSel=document.createElement("select");regSel.className="psel";
+          if(sel.sim&&sel.facetime){
+            regSel.innerHTML='<option value="">Choose...</option>'+REGIONS.map(function(x){return '<option'+(sel.region===x?" selected":"")+'>'+x+'</option>';}).join("");
+            regSel.style.borderColor=sel.region?"var(--green)":"var(--danger)";
+            regSel.onchange=function(){sel.region=regSel.value;renderFamilyDetail();};
+          } else { regSel.innerHTML='<option>Choose FaceTime first</option>';regSel.disabled=true; }
+          c3.appendChild(regSel);trio.appendChild(c3);
+          f.appendChild(trio);
+          if(sel.sim&&sel.facetime&&sel.region){
+            var cw=document.createElement("div");cw.className="cwgrid";
+            var cc=cell("Production Country *",true);
+            var cSel=document.createElement("select");cSel.className="psel";
+            var COUNTRIES_IOS=["Egypt","China","China, Egypt","Vietnam"];
+            cSel.innerHTML='<option value="">Choose...</option>'+COUNTRIES_IOS.map(function(x){return '<option'+(sel.country===x?" selected":"")+'>'+x+'</option>';}).join("");
+            cSel.style.borderColor=sel.country?"var(--green)":"var(--danger)";
+            cSel.onchange=function(){sel.country=cSel.value;renderFamilyDetail();};
+            cc.appendChild(cSel);cw.appendChild(cc);
+            var wc=cell("Warranty Period *",true);
+            var wSel=document.createElement("select");wSel.className="psel";
+            var WARR_IOS=["No Warranty","1 Year","18 Months"];
+            wSel.innerHTML='<option value="">Choose...</option>'+WARR_IOS.map(function(x){return '<option'+(sel.warranty===x?" selected":"")+'>'+x+'</option>';}).join("");
+            wSel.style.borderColor=sel.warranty?"var(--green)":"var(--danger)";
+            wSel.onchange=function(){sel.warranty=wSel.value;renderFamilyDetail();};
+            wc.appendChild(wSel);cw.appendChild(wc);
+            f.appendChild(cw);
+            var ent=document.createElement("div");ent.className="entrygrid";
+            var bcell=cell("Barcode (required) *",true);
+            var bi=document.createElement("input");bi.className="txt";bi.placeholder="Enter barcode for this version";bi.value=sel.barcode||"";
+            bi.style.borderColor=sel.barcode.trim()?"var(--green)":"var(--danger)";
+            bi.oninput=function(){sel.barcode=bi.value;bi.style.borderColor=bi.value.trim()?"var(--green)":"var(--danger)";refreshDone();};
+            bcell.appendChild(bi);ent.appendChild(bcell);
+            var scell=cell("Seller SKU (optional)",false);
+            var si=document.createElement("input");si.className="txt";si.placeholder="Seller SKU (optional)";si.value=sel.sku||"";
+            si.oninput=function(){sel.sku=si.value;};
+            scell.appendChild(si);ent.appendChild(scell);
+            f.appendChild(ent);
+          }
+        } else {
+          // Android expanded row: just Barcode/SKU
+          if(noBC){
+            var bl=document.createElement("label");bl.className="flab req";bl.textContent="Barcode (required) *";
+            var bi=document.createElement("input");bi.className="txt";bi.placeholder="Enter barcode";bi.value=sel.barcode||"";
+            bi.style.borderColor=sel.barcode.trim()?"var(--green)":"var(--danger)";
+            bi.oninput=function(){sel.barcode=bi.value;bi.style.borderColor=bi.value.trim()?"var(--green)":"var(--danger)";};
+            f.appendChild(bl);f.appendChild(bi);
+          }
+          var sl=document.createElement("label");sl.className="flab";sl.textContent="Seller SKU (optional)";
+          var si=document.createElement("input");si.className="txt";si.placeholder="Seller SKU (optional)";si.value=sel.sku||"";
+          si.oninput=function(){sel.sku=si.value;};
+          f.appendChild(sl);f.appendChild(si);
+        }
+        st.appendChild(f);
+      }
+    });
+    colDiv.appendChild(st);row.appendChild(colDiv);
+  });
+  d.appendChild(row);
+  var n=Object.keys(famState.sel).length;
+  if(n){
+    // Production details (once for this batch) + Done button — in the same card
+    var prod=document.createElement("div");prod.style.cssText="margin-top:18px;border-top:1px dashed var(--border);padding-top:16px";
+    prod.innerHTML='<div class="sublabel">Production Details (applied to all selected above)</div>';
+    var grid=document.createElement("div");grid.className="prodgrid";
+    function sel2(labelText,val,opts,onpick){
+      var b=document.createElement("div");
+      var l=document.createElement("label");l.className="plabel req";l.textContent=labelText;
+      var s2=document.createElement("select");s2.className="psel";
+      s2.style.borderColor=val?"var(--green)":"var(--danger)";
+      var o0=document.createElement("option");o0.value="";o0.textContent="Choose...";s2.appendChild(o0);
+      opts.forEach(function(o){var op=document.createElement("option");op.value=o;op.textContent=o;if(val===o)op.selected=true;s2.appendChild(op);});
+      s2.onchange=function(){onpick(s2.value);renderFamilyDetail();};
+      b.appendChild(l);b.appendChild(s2);return b;
+    }
+    grid.appendChild(sel2("Production Country *",famState.country,["Egypt","China","China, Egypt","Vietnam"],function(v){famState.country=v;}));
+    grid.appendChild(sel2("Warranty Period *",famState.warranty,["No Warranty","1 Year","18 Months"],function(v){famState.warranty=v;}));
+    prod.appendChild(grid);
+    // Done button (same style as Change family)
+    var ready = famState.brand==="Apple"
+      ? isReady()
+      : (famState.country && famState.warranty && Object.keys(famState.sel).every(function(k){
+          var v=findVariant(k); return (v&&v.bc)||(famState.sel[k].barcode&&famState.sel[k].barcode.trim());
+        }));
+    var btnWrap=document.createElement("div");btnWrap.style.cssText="display:flex;justify-content:flex-end;margin-top:16px";
+    var done=document.createElement("button");done.className="reset";done.id="iosDone";done.textContent="\u2713 Done! Add to Queue";
+    done.style.cssText+=";font-size:14px;padding:10px 18px";
+    if(!ready){done.style.opacity=".5";done.style.cursor="not-allowed";}
+    done.onclick=function(){
+      if(!ready){alert(famState.brand==="Apple"?"For each ticked storage choose SIM Type, FaceTime, Region, Country, Warranty and Barcode.":"Fill any required barcodes, and choose Country & Warranty first.");return;}
+      if(famState.brand==="Apple"){
+        // iOS: compose name/desc from choices
+        Object.keys(famState.sel).forEach(function(key){
+          var s=famState.sel[key];
+          var parts=key.split("|"); var fam=parts[0],colName=parts[1],storage=parts[2];
+          var icolors=IOS_ADATA[fam]||{};
+          var vobj=(icolors[colName]?icolors[colName].variants:[]).filter(function(v){return v.s===storage;})[0];
+          var base=vobj?vobj.base:null;
+          if(!base)return;
+          var nameEN=composeNameEN(base.name_en,s.sim,s.region,s.facetime);
+          var nameAR=composeNameAR(base.name_ar,s.sim,s.region,s.facetime);
+          if(inQueue(nameEN))return;
+          QUEUE.push({
+            family:fam, brand:"Apple", color:colName, storage:storage, name:nameEN, name_ar:nameAR,
+            desc:composeDescEN(base.desc_en,s.sim,s.facetime), desc_ar:composeDescAR(base.desc_ar,s.sim,s.facetime),
+            hl:base.hl||"", hl_ar:base.hl_ar||"",
+            img:(icolors[colName]?icolors[colName].img:""),
+            barcode:s.barcode||"", sku:s.sku||"", country:s.country||"", warranty:s.warranty||"",
+            sim:s.sim, region:s.region, facetime:s.facetime, isIOS:true
+          });
+        });
+      } else {
+        // Android: existing logic
+        Object.keys(famState.sel).forEach(function(key){
+          var v=findVariant(key);
+          var colors=(ADATA[path[2]]&&ADATA[path[2]][famState.fam])||{},colName="",img="";
+          Object.keys(colors).forEach(function(cn){colors[cn].variants.forEach(function(x){if(x.name===key){colName=cn;img=colors[cn].img;}});});
+          QUEUE.push({
+            family:famState.fam, brand:path[2], color:colName, storage:v?v.s:"", name:key, img:img,
+            barcode:(v&&v.bc)?v.bc:(famState.sel[key].barcode||""),
+            sku:famState.sel[key].sku||"", country:famState.country, warranty:famState.warranty
+          });
+        });
+      }
+      backToFams(); renderQueue();
+      $("queueCard").scrollIntoView({behavior:"smooth",block:"nearest"});
+    };
+    btnWrap.appendChild(done);prod.appendChild(btnWrap);
+    d.appendChild(prod);
+  } else {
+    var note=document.createElement("div");note.className="next";note.style.marginTop="16px";
+    note.textContent="Tick one or more storages under any colour(s) \u2014 you can mix colours and storages for this family.";
+    d.appendChild(note);
+  }
+}
+function backToFams(){ famState.fam=""; famState.sel={}; famState.country=""; famState.warranty=""; renderFamGrid(); scrollC($("famCard")); }
+function changeBrand(){ famState.fam=""; famState.sel={}; famState.country=""; famState.warranty=""; if(path.length>=3) path=path.slice(0,2); render(); scrollC($("navCard")); var b=$("brands"); if(b){ b.classList.remove("anim"); void b.offsetWidth; b.classList.add("anim"); setTimeout(function(){b.classList.remove("anim");},800); } }
+var famClearArmed=false,famClearTimer=null;
+function clearFamSel(){
+  if(!Object.keys(famState.sel).length) return;
+  var btn=$("famClear");
+  if(!famClearArmed){
+    famClearArmed=true; btn.textContent="Tap again to clear";
+    famClearTimer=setTimeout(function(){famClearArmed=false;btn.innerHTML="&#128465; Clear all";},3000);
+    return;
+  }
+  clearTimeout(famClearTimer); famClearArmed=false;
+  famState.sel={};
+  renderFamilyDetail();
+}
+var QUEUE=[];var queueOpen=false;var qOpenBrand={},qOpenFam={},qJustToggled=null;
+function toggleQueue(){ queueOpen=!queueOpen; applyQueueOpen(); if(queueOpen){ staggerIn($("queueList")); scrollC($("queueList")); } else { scrollC($("queueCard")); } }
+function applyQueueOpen(){
+  var list=$("queueList"),tg=$("qtoggle");
+  if(queueOpen){ list.classList.add("open"); tg.innerHTML="Hide &#9652;"; }
+  else { list.classList.remove("open"); tg.innerHTML="Show &#9662;"; }
+}
+function inQueue(name){ for(var i=0;i<QUEUE.length;i++){ if(QUEUE[i].name===name) return true; } return false; }
+var imgCache={},imgCacheFam="";
+function staggerIn(el){ el.classList.remove("justopen"); void el.offsetWidth; el.classList.add("justopen"); }
+function renderQueue(){
+  if(!QUEUE.length){ $("queueCard").classList.add("hidden"); return; }
+  var qc=$("queueCard");if(qc.classList.contains("hidden")){qc.classList.remove("hidden");playReveal(qc);}
+  $("qcount").textContent=QUEUE.length+(QUEUE.length===1?" item":" items");
+  var box=$("queueList");box.innerHTML="";
+  // group brand -> family -> [{it,idx}]
+  var brands={},border=[];
+  QUEUE.forEach(function(it,idx){
+    if(!brands[it.brand]){brands[it.brand]={fams:{},order:[],count:0};border.push(it.brand);}
+    var b=brands[it.brand];
+    if(!b.fams[it.family]){b.fams[it.family]=[];b.order.push(it.family);}
+    b.fams[it.family].push({it:it,idx:idx}); b.count++;
+  });
+  border.forEach(function(brand){
+    var b=brands[brand];
+    var bWrap=document.createElement("div");bWrap.className="qbrand";
+    var bopen=!!qOpenBrand[brand];
+    var bHead=document.createElement("div");bHead.className="qbrandhead";
+    bHead.innerHTML='<span class="qchev">'+(bopen?"\u25be":"\u25b8")+'</span><span class="qbname"></span><span class="qbadge"></span>';
+    bHead.querySelector(".qbname").textContent=brand;
+    bHead.querySelector(".qbadge").textContent=b.count+(b.count===1?" item":" items");
+    bHead.onclick=function(){
+      var open=bBody.classList.toggle("open"); qOpenBrand[brand]=open;
+      bHead.querySelector(".qchev").textContent=open?"\u25be":"\u25b8";
+      if(open) staggerIn(bBody);
+    };
+    bWrap.appendChild(bHead);
+    var bBody=document.createElement("div");bBody.className="qbody"+(bopen?" open":"");
+    b.order.forEach(function(fam){
+      var items=b.fams[fam];
+      var fWrap=document.createElement("div");fWrap.className="qfam";
+      var fkey=brand+"|"+fam; var fopen=!!qOpenFam[fkey];
+      var fHead=document.createElement("div");fHead.className="qfamhead";
+      fHead.innerHTML='<span class="qchev">'+(fopen?"\u25be":"\u25b8")+'</span><span class="qfname"></span><span class="qbadge2"></span>';
+      fHead.querySelector(".qfname").textContent=fam;
+      fHead.querySelector(".qbadge2").textContent="("+items.length+")";
+      fHead.onclick=function(){
+        var open=fBody.classList.toggle("open"); qOpenFam[fkey]=open;
+        fHead.querySelector(".qchev").textContent=open?"\u25be":"\u25b8";
+        if(open) staggerIn(fBody);
+      };
+      fWrap.appendChild(fHead);
+      var fBody=document.createElement("div");fBody.className="qbody"+(fopen?" open":"");
+      items.forEach(function(o){
+        var it=o.it;
+        var r=document.createElement("div");r.className="qrow";
+        var im=fThumb(it.img);
+        var t=document.createElement("img");t.className="qthumb";t.loading="lazy";if(im){t.src=im;t.onerror=function(){this.onerror=null;this.src=it.img;};}
+        var main=document.createElement("div");main.className="qmain";
+        main.innerHTML='<div class="qname"></div><div class="qmeta"></div>';
+        main.querySelector(".qname").textContent=it.color+" \u00b7 "+it.storage;
+        main.querySelector(".qmeta").textContent="Barcode: "+(it.barcode||"\u2014")+(it.sku?(" \u00b7 SKU: "+it.sku):"")+" \u00b7 "+it.country+" \u00b7 "+it.warranty;
+        var rm=document.createElement("button");rm.className="qrm";rm.innerHTML="\u2715";rm.title="Remove";
+        rm.onclick=function(e){ e.stopPropagation(); QUEUE.splice(o.idx,1); renderQueue(); if(famState.fam && !$("famDetail").classList.contains("hidden")) renderFamilyDetail(); };
+        r.appendChild(t);r.appendChild(main);r.appendChild(rm);
+        fBody.appendChild(r);
+      });
+      fWrap.appendChild(fBody);
+      bBody.appendChild(fWrap);
+    });
+    bWrap.appendChild(bBody);
+    box.appendChild(bWrap);
+  });
+  applyQueueOpen();
+}
+function toast(msg){var t=document.getElementById("toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";document.body.appendChild(t);}t.textContent=msg;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2600);}
+
+/* ===== iOS GLOBAL VARS ===== */
+var IOS_ADATA={}, IOS_FAMS=[], iosLoaded=false;
+var REGIONS=["International","Japanese","Middle East","Chinese","USA"];
+var SIM_LIST=["Single SIM","Dual SIM","eSIM Only"];
+var SIM_TEXT_EN={"Single SIM":"Nano-SIM and eSIM","Dual SIM":"Dual Nano-SIM","eSIM Only":"eSIM only"};
+var SIM_TEXT_AR={"Single SIM":"Nano-SIM \u0648 eSIM","Dual SIM":"\u0634\u0631\u064a\u062d\u062a\u0627\u0646 Nano-SIM","eSIM Only":"eSIM \u0641\u0642\u0637"};
+var SIM_AR_NAME={"Single SIM":"\u0634\u0631\u064a\u062d\u0629 \u0648\u0627\u062d\u062f\u0629","Dual SIM":"\u0634\u0631\u064a\u062d\u062a\u0627\u0646","eSIM Only":"eSIM \u0641\u0642\u0637"};
+var REGION_AR={"International":"\u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644\u062f\u0648\u0644\u064a\u0629","Japanese":"\u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644\u064a\u0627\u0628\u0627\u0646\u064a\u0629","Middle East":"\u0646\u0633\u062e\u0629 \u0627\u0644\u0634\u0631\u0642 \u0627\u0644\u0623\u0648\u0633\u0637","Chinese":"\u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644\u0635\u064a\u0646\u064a\u0629","USA":"\u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644\u0623\u0645\u0631\u064a\u0643\u064a\u0629"};
+var FT_AR={"FaceTime Supported":"\u0645\u062f\u0639\u0648\u0645","FaceTime Not Supported":"\u063a\u064a\u0631 \u0645\u062f\u0639\u0648\u0645"};
+var SIM_RE=/Single SIM|Dual SIM|eSIM Only/;
+var SIM_RE_AR=/Single SIM|Dual SIM|eSIM Only|\u0634\u0631\u064a\u062d\u0629 \u0648\u0627\u062d\u062f\u0629|\u0634\u0631\u064a\u062d\u062a\u0627\u0646|eSIM \u0641\u0642\u0637/;
+function genOf(f){var m=/iPhone (\d+)/.exec(f);return m?parseInt(m[1],10):0;}
+function famRank(f){if(/mini/i.test(f))return 0;if(/Pro Max/i.test(f))return 4;if(/\bPro\b/i.test(f))return 3;if(/Plus/i.test(f))return 2;if(/Air/i.test(f))return 2;return 1;}
+function storageGB(s){var m=/([\d.]+)\s*(TB|GB)/i.exec(s||"");if(!m)return 0;var n=parseFloat(m[1]);return /TB/i.test(m[2])?n*1024:n;}
+function isReady(){var ks=Object.keys(famState.sel);return ks.length>0&&ks.every(function(k){var s=famState.sel[k];return s.sim&&s.facetime&&s.region&&s.country&&s.warranty&&s.barcode&&String(s.barcode).trim();});}
+function refreshDone(btn){btn=btn||document.getElementById("iosDone");if(!btn)return;var r=isReady();btn.style.opacity=r?"1":".5";btn.style.cursor=r?"pointer":"not-allowed";}
+function composeNameEN(base,sim,region,facetime){return base.replace(SIM_RE,sim)+' "'+region+' Version" "'+facetime+'"';}
+function composeNameAR(base,sim,region,facetime){return base.replace(SIM_RE_AR,(SIM_AR_NAME[sim]||sim))+' "'+(REGION_AR[region]||region)+'" "FaceTime '+(FT_AR[facetime]||"")+'"';}
+function composeDescEN(d,sim,facetime){d=d||"";if(SIM_TEXT_EN[sim])d=d.replace(/(<li>SIM:\s*)[^<]*(<\/li>)/,"$1"+SIM_TEXT_EN[sim]+"$2");d=d.replace(/(<li>FaceTime:\s*)[^<]*(<\/li>)/,"$1"+(facetime==="FaceTime Supported"?"Supported":"Not Supported")+"$2");return d;}
+function composeDescAR(d,sim,facetime){d=d||"";if(SIM_TEXT_AR[sim])d=d.replace(/(<li>\u0634\u0631\u064a\u062d\u0629 \u0627\u0644\u0627\u062a\u0635\u0627\u0644:\s*)[^<]*(<\/li>)/,"$1"+SIM_TEXT_AR[sim]+"$2");d=d.replace(/(<li>FaceTime:\s*)[^<]*(<\/li>)/,"$1"+(FT_AR[facetime]||"")+"$2");return d;}
+function loadiOSCatalog(){
+  if(iosLoaded)return;
+  sb.from("master_data_ios").select("model_family,rom,color,name_en,name_ar,long_desc_en,highlights_en,long_desc_ar,highlights_ar,image1").order("id",{ascending:true}).then(function(res){
+    if(res.error){console.warn("iOS catalog load failed:",res.error.message);return;}
+    var data=res.data||[]; if(!data.length)return;
+    IOS_ADATA={}; IOS_FAMS=[];
+    data.forEach(function(r){
+      var f=r.model_family,rom=r.rom,color=r.color;
+      if(!f||!rom||!color)return;
+      if(!IOS_ADATA[f]){IOS_ADATA[f]={};IOS_FAMS.push(f);}
+      if(!IOS_ADATA[f][color]){IOS_ADATA[f][color]={img:r.image1||"",variants:[],_si:{}};}
+      var bc=IOS_ADATA[f][color];
+      if(bc._si[rom]===undefined){bc._si[rom]=bc.variants.length;bc.variants.push({s:rom,base:{name_en:r.name_en,name_ar:r.name_ar,desc_en:r.long_desc_en,desc_ar:r.long_desc_ar,hl:r.highlights_en,hl_ar:r.highlights_ar}});}
+    });
+    Object.keys(IOS_ADATA).forEach(function(f){Object.keys(IOS_ADATA[f]).forEach(function(c){delete IOS_ADATA[f][c]._si;IOS_ADATA[f][c].variants.sort(function(a,b){return storageGB(a.s)-storageGB(b.s);});});});
+    iosLoaded=true;
+    if(path[0]==="Phones"&&path[1]==="iOS")render();
+  },function(err){console.warn("iOS catalog request failed:",err);});
+}
+/* ===== END iOS GLOBALS ===== */
+function submitAll(){
+  if(!QUEUE.length){alert("Your queue is empty.");return;}
+  if(!shopName){alert("Please enter your shop name first.");return;}
+  var btn=document.getElementById("submitBtn");var orig=btn.innerHTML;btn.innerHTML='<span class="spinner"></span>Submitting...';
+  var rows=QUEUE.map(function(q){
+    var r={shop_name:shopName,name_en:q.name,brand:q.brand,model_family:q.family,country:q.country,warranty:q.warranty,barcode:q.barcode||"",seller_sku:q.sku||""};
+    if(q.isIOS){r.is_ios=true;r.name_ar=q.name_ar||"";r.desc_en=q.desc||"";r.desc_ar=q.desc_ar||"";r.highlights_en=q.hl||"";r.highlights_ar=q.hl_ar||"";r.color=q.color||"";r.image1=q.img||"";}
+    return r;
+  });
+  var n=rows.length;
+  sb.from("submissions").insert(rows).then(function(res){
+    btn.innerHTML=orig;
+    if(res.error){alert("Submit failed: "+res.error.message);return;}
+    toast("Submitted "+n+" model(s) successfully");
+    QUEUE=[];qOpenBrand={};qOpenFam={};queueOpen=false;
+    path=[];famState={brand:"",fam:"",sel:{},country:"",warranty:""};shopName="";
+    document.getElementById("shop").value="";
+    renderQueue();render();
+    document.getElementById("picker").classList.add("hidden");
+    document.getElementById("page1").classList.remove("hidden");
+    window.scrollTo({top:0,behavior:"smooth"});
+  },function(err){btn.innerHTML=orig;alert("Submit failed: "+(err&&err.message?err.message:err));});
+}
+function changeShopName(){
+  shopName="";
+  document.getElementById("shop").value="";
+  document.getElementById("picker").classList.add("hidden");
+  document.getElementById("page1").classList.remove("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function startShop(){
+  var v=document.getElementById("shop").value.trim();
+  if(!v){alert("Please enter your shop name first.");return;}
+  shopName=v;
+  document.getElementById("greetShop").textContent=shopName;
+  document.getElementById("page1").classList.add("hidden");
+  document.getElementById("picker").classList.remove("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function switchView(v){
+  document.getElementById("tabV").classList.toggle("on",v==="vendor");
+  document.getElementById("tabA").classList.toggle("on",v==="admin");
+  document.getElementById("vendor").classList.toggle("hidden",v!=="vendor");
+  document.getElementById("admin").classList.toggle("hidden",v!=="admin");
+}
+/* ---- live catalog ---- */
+function loadCatalog(){
+  sb.from("master_data").select("barcode,brand,model_family,ram,rom,color,name_en,image1").order("id",{ascending:true}).then(function(res){
+    if(res.error){console.warn("Catalog load failed, using fallback:",res.error.message);return;}
+    var data=res.data||[];if(!data.length){return;}
+    var A={},F={},B=[];
+    data.forEach(function(m){
+      var br=m.brand,fam=m.model_family,col=m.color;if(!br||!fam||!col)return;
+      if(!A[br]){A[br]={};F[br]=[];B.push(br);}
+      if(!A[br][fam]){A[br][fam]={};F[br].push(fam);}
+      if(!A[br][fam][col]){A[br][fam][col]={img:m.image1||"",variants:[]};}
+      A[br][fam][col].variants.push({s:(m.ram||"")+" / "+(m.rom||""),name:m.name_en,bc:m.barcode||""});
+    });
+    ADATA=A;SAMPLE_FAMS=F;BRANDS=B;
+    if(path&&path.length)render();
+  },function(err){console.warn("Catalog request failed:",err);});
+}
+/* ---- ADMIN ---- */
+function doLogin(){if(document.getElementById("pass").value===PASS){document.getElementById("login").classList.add("hidden");document.getElementById("dash").classList.remove("hidden");loadSubs();}else{document.getElementById("passErr").classList.remove("hidden");}}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function loadSubs(){
+  document.getElementById("subsBox").innerHTML='<p style="color:var(--dim);text-align:center;margin:30px 0">Loading...</p>';
+  sb.from("submissions").select("*").order("id",{ascending:true}).then(function(res){
+    if(res.error){document.getElementById("subsBox").innerHTML='<p style="color:var(--dim);padding:20px">Error: '+esc(res.error.message)+'</p>';return;}
+    renderSubs(res.data||[]);
+  });
+}
+function renderSubs(subs){
+  document.getElementById("subCount").textContent=subs.length;
+  if(!subs.length){document.getElementById("subsBox").innerHTML='<div style="text-align:center;padding:44px"><div style="font-size:40px;opacity:.5">&#128237;</div><p style="color:var(--dim)">No submissions yet.</p></div>';return;}
+  var h='<div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Shop</th><th>Model</th><th>Brand</th><th>Family</th><th>Country</th><th>Warranty</th><th>Barcode</th><th>SKU</th><th>Date</th><th></th></tr></thead><tbody>';
+  subs.forEach(function(s,i){
+    h+='<tr><td style="color:var(--dim)">'+(i+1)+'</td><td style="font-weight:700">'+esc(s.shop_name)+'</td><td style="max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(s.name_en)+'</td><td>'+esc(s.brand)+'</td><td style="color:var(--dim)">'+esc(s.model_family)+'</td><td><span class="badge">'+esc(s.country)+'</span></td><td>'+esc(s.warranty)+'</td><td style="color:var(--dim);font-size:11px">'+esc(s.barcode||"-")+'</td><td style="color:var(--dim);font-size:11px">'+esc(s.seller_sku||"-")+'</td><td style="color:var(--dim);font-size:11px">'+esc((s.created_at||"").slice(0,10))+'</td><td><button class="qrm" onclick="delSub('+s.id+')">\u2715</button></td></tr>';
+  });
+  h+='</tbody></table></div>';
+  document.getElementById("subsBox").innerHTML=h;
+}
+function delSub(id){sb.from("submissions").delete().eq("id",id).then(loadSubs);}
+var subsClearArmed=false,subsClearTimer=null;
+function clearSubs(){
+  var btn=event&&event.target?event.target:null;
+  if(!subsClearArmed){subsClearArmed=true;if(btn)btn.textContent="Tap again to delete ALL";subsClearTimer=setTimeout(function(){subsClearArmed=false;if(btn)btn.innerHTML="\uD83D\uDDD1 Clear All";},3000);return;}
+  clearTimeout(subsClearTimer);subsClearArmed=false;if(btn)btn.innerHTML="\uD83D\uDDD1 Clear All";
+  sb.from("submissions").delete().neq("id",0).then(loadSubs);
+}
+var BULK_HEADERS=["Name","Name_AR","Name_FR","Description","Description_AR","Description_FR","SellerSKU","ParentSKU","Brand","PrimaryCategory","GTIN_Barcode","Price_EGP","Sale_Price_EGP","Sale_Price_Start_At","Sale_Price_End_At","Stock","variation","battery_feature","bluetooth","certifications","chipset_manufacturer","color","color_AR","color_FR","color_family","condition","cpu_brand","cpu_cores","cpu_speed","display_features","display_size","expandable_memory","external_memory_slot","extra_features","graphics_processor","health_features","main_material","manufacturer_txt","material_family","megapixels","memory_capacity","memory_technology","model","network_coverage","note","operating_system","package_content","package_content_AR","package_content_FR","panel_type","product_line","product_measures","product_warranty","product_weight","production_country","rear_camera","screen_size","security_features","short_description","short_description_AR","short_description_FR","sim_size","storage_capacity","warranty_address","warranty_duration","warranty_type","youtube_id","MainImage","Image2","Image3","Image4","Image5","Image6","Image7","Image8"];
+function csvEsc(v){if(v===null||v===undefined||v==="")return "";var s=String(v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function saveFile(filename,text){try{var blob=new Blob(["\ufeff"+text],{type:"text/csv;charset=utf-8"});if(window.navigator&&window.navigator.msSaveOrOpenBlob){window.navigator.msSaveOrOpenBlob(blob,filename);return;}var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;a.download=filename;a.style.display="none";document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1500);}catch(e){alert("Could not start download: "+e.message);}}
+function downloadCsv(){
+  sb.from("submissions").select("*").order("id",{ascending:true}).then(function(sres){
+    if(sres.error){alert("CSV failed (submissions): "+sres.error.message);return;}
+    var subs=sres.data||[];if(!subs.length){alert("No submissions to export yet.");return;}
+    sb.from("master_data").select("*").then(function(mres){
+      if(mres.error){alert("CSV failed (catalog): "+mres.error.message);return;}
+      try{
+        var byName={};(mres.data||[]).forEach(function(m){byName[m.name_en]=m;});
+        var rows=[BULK_HEADERS.map(csvEsc).join(",")];var matched=0;
+        subs.forEach(function(s){
+          var m=byName[s.name_en];if(!m)return;matched++;
+          var isIOS=!!(s.is_ios); // iOS rows flagged in submissions
+          var bc=isIOS?(s.barcode||""):(m?(m.barcode||s.barcode||""):"");
+          var sku=(s.seller_sku&&s.seller_sku.trim())?s.seller_sku.trim():bc;
+          var r=new Array(75).fill("");
+          if(isIOS){
+            r[0]=s.name_en||"";r[1]=s.name_ar||"";r[3]=s.desc_en||"";r[4]=s.desc_ar||"";
+            r[6]=sku;r[7]=sku;r[8]="Apple";r[9]="";// iOS: PrimaryCategory blank
+            r[10]=bc;r[15]=0;r[16]="...";
+            r[21]=s.color||"";r[42]=s.model_family||"";
+            r[52]=s.warranty||"";r[54]=s.country||"";r[58]=s.highlights_en||"";r[59]=s.highlights_ar||"";
+            var imgs=[s.image1||""];for(var k=0;k<7;k++)r[67+k]=(imgs[k]||"").trim();
+          } else {
+            if(!m)return;
+            var nameAR=m.name_ar||"";var colorAR=nameAR.indexOf(" - ")>-1?nameAR.split(" - ").pop().trim():"";
+            r[0]=m.name_en;r[1]=m.name_ar;r[3]=m.long_desc_en;r[4]=m.long_desc_ar;
+            r[6]=sku;r[7]=sku;r[8]=m.brand;
+            r[9]="1002300 - Phones & Tablets / Mobile Phones / Smartphones / Android Phones";
+            r[10]=bc;r[15]=0;r[16]="...";
+            r[21]=m.color;r[22]=colorAR;r[42]=m.model_family;
+            r[52]=s.warranty;r[54]=s.country;r[58]=m.highlights_en;r[59]=m.highlights_ar;
+            var imgs=[m.image1,m.image2,m.image3,m.image4,m.image5,m.image6,m.image7];
+            for(var k=0;k<7;k++)r[67+k]=(imgs[k]||"").trim();
+          }
+          rows.push(r.map(csvEsc).join(","));
+        });
+        if(matched===0){alert("None of the submitted models matched the catalog, so the CSV is empty.");return;}
+        var shops={};subs.forEach(function(s){if(s.shop_name)shops[s.shop_name.trim()]=1;});
+        var sl=Object.keys(shops);var label=sl.length===1?sl[0]:(sl.length+"_shops");
+        label=label.replace(/[\\/:*?"<>|]/g,"_").replace(/\s+/g,"_").slice(0,60);
+        saveFile("BulkSheet_"+label+"_"+new Date().toISOString().slice(0,10)+".csv",rows.join("\n"));
+      }catch(e){alert("CSV build error: "+e.message);}
+    },function(err){alert("CSV failed (catalog request): "+(err&&err.message?err.message:err));});
+  },function(err){alert("CSV failed (submissions request): "+(err&&err.message?err.message:err));});
+}
+var clearArmed=false,clearTimer=null;
+function clearQueue(){
+  if(!QUEUE.length) return;
+  var btn=$("clearBtn");
+  if(!clearArmed){
+    clearArmed=true; btn.textContent="Tap again to clear";
+    clearTimer=setTimeout(function(){clearArmed=false;btn.innerHTML="&#128465; Clear All";},3000);
+    return;
+  }
+  clearTimeout(clearTimer); clearArmed=false;
+  QUEUE=[]; qOpenBrand={}; qOpenFam={};
+  renderQueue();
+  if(famState.fam && !$("famDetail").classList.contains("hidden")) renderFamilyDetail();
+}
+function resetNav(){ path=[]; render(); scrollC($("navCard")); }
+render();
+loadCatalog();
+</script>
+</body></html>
