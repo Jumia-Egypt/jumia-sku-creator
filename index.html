@@ -737,9 +737,10 @@ function composeDescEN(d,sim,facetime){d=d||"";if(SIM_TEXT_EN[sim])d=d.replace(/
 function composeDescAR(d,sim,facetime){d=d||"";if(SIM_TEXT_AR[sim])d=d.replace(/(<li>\u0634\u0631\u064a\u062d\u0629 \u0627\u0644\u0627\u062a\u0635\u0627\u0644:\s*)[^<]*(<\/li>)/,"$1"+SIM_TEXT_AR[sim]+"$2");d=d.replace(/(<li>FaceTime:\s*)[^<]*(<\/li>)/,"$1"+(FT_AR[facetime]||"")+"$2");return d;}
 function loadiOSCatalog(){
   if(iosLoaded)return;
-  sb.from("master_data_ios").select("model_family,rom,color,name_en,name_ar,long_desc_en,highlights_en,long_desc_ar,highlights_ar,image1").order("id",{ascending:true}).then(function(res){
-    if(res.error){console.warn("iOS catalog load failed:",res.error.message);return;}
-    var data=res.data||[]; if(!data.length)return;
+  sb.from("master_data_ios").select("id,model_family,rom,color,name_en,name_ar,long_desc_en,highlights_en,long_desc_ar,highlights_ar,image1").order("id",{ascending:true}).then(function(res){
+    if(res.error){console.error("iOS catalog load failed:",res.error.message,res.error);iosLoaded=false;return;}
+    var data=res.data||[]; if(!data.length){console.warn("iOS catalog: no data returned");return;}
+    console.log("iOS catalog loaded:",data.length,"rows");
     IOS_ADATA={}; IOS_FAMS=[];
     data.forEach(function(r){
       var f=r.model_family,rom=r.rom,color=r.color;
@@ -865,7 +866,7 @@ function downloadCsv(){
           var r=new Array(75).fill("");
           if(isIOS){
             r[0]=s.name_en||"";r[1]=s.name_ar||"";r[3]=s.desc_en||"";r[4]=s.desc_ar||"";
-            r[6]=sku;r[7]=sku;r[8]="Apple";r[9]="";// iOS: PrimaryCategory blank
+            r[6]=sku;r[7]=sku;r[8]="Apple";r[9]="1002314 - Phones & Tablets / Mobile Phones / Smartphones / iOS Phones";
             r[10]=bc;r[15]=0;r[16]="...";
             r[21]=s.color||"";r[42]=s.model_family||"";
             r[52]=s.warranty||"";r[54]=s.country||"";r[58]=s.highlights_en||"";r[59]=s.highlights_ar||"";
