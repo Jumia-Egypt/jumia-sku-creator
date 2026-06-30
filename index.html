@@ -74,8 +74,8 @@ nav{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.85);backdrop-f
 .famgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px}
 #brands .opt,.famgrid .opt{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;font-size:11.5px;line-height:1.2;padding:11px 8px;min-height:42px;display:flex;align-items:center;justify-content:center}
 .hidden{display:none!important}
-.colorrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:6px;justify-content:center}
-.colorcol{width:100%;max-width:420px}
+.colorrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:6px}
+.colorcol{width:100%}
 @keyframes colIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 #famDetail.anim .colorcol{animation:colIn .45s cubic-bezier(.22,.61,.36,1) both}
 #famDetail.anim .colorcol:nth-child(1){animation-delay:.04s}#famDetail.anim .colorcol:nth-child(2){animation-delay:.13s}
@@ -432,16 +432,10 @@ function renderFamilyDetail(){
   var brand=famState.brand, colors=(brand==="Apple"?(IOS_ADATA[famState.fam]||{}):(ADATA[brand]&&ADATA[brand][famState.fam])||{});
   var d=$("famDetail");d.innerHTML="";
   var row=document.createElement("div");row.className="colorrow";
-  var colorCount=Object.keys(colors).length;
   if(brand==="Apple"&&window.innerWidth>600){
-    var perRow;
-    if(colorCount>=7) perRow=4;
-    else if(colorCount===6) perRow=3;       // 2 rows of 3
-    else if(colorCount===5) perRow=3;       // row of 3 + row of 2
-    else if(colorCount===4) perRow=2;       // 2 rows of 2
-    else if(colorCount===3) perRow=3;       // 1 row of 3
-    else perRow=colorCount||1;
-    row.style.gridTemplateColumns="repeat("+perRow+",1fr)";
+    row.style.display="grid";
+    row.style.gridTemplateColumns="repeat(3,1fr)";
+    row.style.gap="16px";
   }
   Object.keys(colors).forEach(function(col){
     var c=colors[col];
