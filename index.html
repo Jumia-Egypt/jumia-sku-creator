@@ -560,23 +560,26 @@ function renderFamilyDetail(){
   d.appendChild(row);
   var n=Object.keys(famState.sel).length;
   if(n){
-    // Production details (once for this batch) + Done button — in the same card
+    var isApple=famState.brand==="Apple";
+    // Production details (once for this batch) + Done button — Android only; iOS has per-storage Country/Warranty already
     var prod=document.createElement("div");prod.style.cssText="margin-top:18px;border-top:1px dashed var(--border);padding-top:16px";
-    prod.innerHTML='<div class="sublabel">Production Details (applied to all selected above)</div>';
-    var grid=document.createElement("div");grid.className="prodgrid";
-    function sel2(labelText,val,opts,onpick){
-      var b=document.createElement("div");
-      var l=document.createElement("label");l.className="plabel req";l.textContent=labelText;
-      var s2=document.createElement("select");s2.className="psel";
-      s2.style.borderColor=val?"var(--green)":"var(--danger)";
-      var o0=document.createElement("option");o0.value="";o0.textContent="Choose...";s2.appendChild(o0);
-      opts.forEach(function(o){var op=document.createElement("option");op.value=o;op.textContent=o;if(val===o)op.selected=true;s2.appendChild(op);});
-      s2.onchange=function(){onpick(s2.value);renderFamilyDetail();};
-      b.appendChild(l);b.appendChild(s2);return b;
+    if(!isApple){
+      prod.innerHTML='<div class="sublabel">Production Details (applied to all selected above)</div>';
+      var grid=document.createElement("div");grid.className="prodgrid";
+      function sel2(labelText,val,opts,onpick){
+        var b=document.createElement("div");
+        var l=document.createElement("label");l.className="plabel req";l.textContent=labelText;
+        var s2=document.createElement("select");s2.className="psel";
+        s2.style.borderColor=val?"var(--green)":"var(--danger)";
+        var o0=document.createElement("option");o0.value="";o0.textContent="Choose...";s2.appendChild(o0);
+        opts.forEach(function(o){var op=document.createElement("option");op.value=o;op.textContent=o;if(val===o)op.selected=true;s2.appendChild(op);});
+        s2.onchange=function(){onpick(s2.value);renderFamilyDetail();};
+        b.appendChild(l);b.appendChild(s2);return b;
+      }
+      grid.appendChild(sel2("Production Country *",famState.country,["Egypt","China","China, Egypt","Vietnam"],function(v){famState.country=v;}));
+      grid.appendChild(sel2("Warranty Period *",famState.warranty,["No Warranty","1 Year","18 Months"],function(v){famState.warranty=v;}));
+      prod.appendChild(grid);
     }
-    grid.appendChild(sel2("Production Country *",famState.country,["Egypt","China","China, Egypt","Vietnam"],function(v){famState.country=v;}));
-    grid.appendChild(sel2("Warranty Period *",famState.warranty,["No Warranty","1 Year","18 Months"],function(v){famState.warranty=v;}));
-    prod.appendChild(grid);
     // Done button (same style as Change family)
     var ready = famState.brand==="Apple"
       ? isReady()
