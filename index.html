@@ -776,12 +776,21 @@ function loadiOSCatalog(){
 }
 function preloadIOSThumbs(data){
   var seen={};
+  var urls=[];
   data.forEach(function(r){
     if(!r.image1||seen[r.image1])return;
     seen[r.image1]=1;
-    var im=new Image();
-    im.src=fThumb(r.image1);
+    urls.push(r.image1);
   });
+  var i=0;
+  function next(){
+    if(i>=urls.length)return;
+    var im=new Image();
+    im.onload=im.onerror=function(){ next(); };
+    im.src=fThumb(urls[i++]);
+  }
+  // run a few in parallel lanes instead of one giant burst
+  for(var lane=0;lane<4;lane++) next();
 }
 function fetchIOSDescription(variantId,cb){
   var url=SUPABASE_URL+"/rest/v1/master_data_ios?select=long_desc_en,highlights_en,long_desc_ar,highlights_ar&id=eq."+variantId;
