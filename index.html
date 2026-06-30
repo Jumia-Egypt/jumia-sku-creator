@@ -434,7 +434,13 @@ function renderFamilyDetail(){
   var row=document.createElement("div");row.className="colorrow";
   var colorCount=Object.keys(colors).length;
   if(brand==="Apple"&&window.innerWidth>600){
-    var perRow = colorCount>=6 ? 3 : (colorCount>=4 ? 2 : (colorCount>=2?2:1));
+    var perRow;
+    if(colorCount>=7) perRow=4;
+    else if(colorCount===6) perRow=3;       // 2 rows of 3
+    else if(colorCount===5) perRow=3;       // row of 3 + row of 2
+    else if(colorCount===4) perRow=2;       // 2 rows of 2
+    else if(colorCount===3) perRow=3;       // 1 row of 3
+    else perRow=colorCount||1;
     row.style.gridTemplateColumns="repeat("+perRow+",1fr)";
   }
   Object.keys(colors).forEach(function(col){
