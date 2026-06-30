@@ -432,6 +432,11 @@ function renderFamilyDetail(){
   var brand=famState.brand, colors=(brand==="Apple"?(IOS_ADATA[famState.fam]||{}):(ADATA[brand]&&ADATA[brand][famState.fam])||{});
   var d=$("famDetail");d.innerHTML="";
   var row=document.createElement("div");row.className="colorrow";
+  var colorCount=Object.keys(colors).length;
+  if(brand==="Apple"&&window.innerWidth>600){
+    var perRow = colorCount>=6 ? 3 : (colorCount>=4 ? 2 : (colorCount>=2?2:1));
+    row.style.gridTemplateColumns="repeat("+perRow+",1fr)";
+  }
   Object.keys(colors).forEach(function(col){
     var c=colors[col];
     var colDiv=document.createElement("div");colDiv.className="colorcol";
@@ -449,20 +454,23 @@ function renderFamilyDetail(){
     // per-colour Select All (same style as Change family / Done)
     var allBtn=document.createElement("button");allBtn.className="reset";
     allBtn.style.cssText="display:block;width:100%;margin-bottom:10px;font-size:12px;padding:7px 10px";
-    var selectable=c.variants.filter(function(v){return !inQueue(v.name);});
-    var allOn=selectable.length>0 && selectable.every(function(v){return famState.sel[v.name];});
+    var selectable=c.variants.filter(function(v){ return famState.brand==="Apple" ? !inQueueIOS(famState.fam,col,v.s) : !inQueue(v.name); });
+    var keyFor=function(v){ return famState.brand==="Apple" ? (famState.fam+"|"+col+"|"+v.s) : v.name; };
+    var allOn=selectable.length>0 && selectable.every(function(v){return famState.sel[keyFor(v)];});
     allBtn.textContent=allOn?"\u2713 Deselect all":"Select all storages";
     if(!selectable.length){allBtn.style.opacity=".5";allBtn.style.cursor="not-allowed";}
     allBtn.onclick=function(){
       if(!selectable.length) return;
-      if(allOn){ selectable.forEach(function(v){delete famState.sel[v.name];}); }
-      else { selectable.forEach(function(v){ if(!famState.sel[v.name]) famState.sel[v.name]={barcode:"",sku:""}; }); }
+      if(allOn){ selectable.forEach(function(v){delete famState.sel[keyFor(v)];}); }
+      else { selectable.forEach(function(v){ var k=keyFor(v); if(!famState.sel[k]) famState.sel[k]= famState.brand==="Apple" ? {sim:"",facetime:"",region:"",country:"",warranty:"",barcode:"",sku:""} : {barcode:"",sku:""}; }); }
       renderFamilyDetail();
     };
     colDiv.appendChild(allBtn);
     var st=document.createElement("div");st.className="stbox";
     c.variants.forEach(function(v){
-      var key=v.name,added=inQueue(key),sel=famState.sel[key],on=!!sel,noBC=!v.bc;
+      var key=famState.brand==="Apple" ? (famState.fam+"|"+col+"|"+v.s) : v.name;
+      var added=famState.brand==="Apple" ? inQueueIOS(famState.fam,col,v.s) : inQueue(key);
+      var sel=famState.sel[key],on=!!sel,noBC=!v.bc;
       var sr=document.createElement("div");sr.className="strow"+(added?" added":(on?" on":""));
       sr.innerHTML='<div class="cb">'+((added||on)?"\u2713":"")+'</div><span></span>';
       sr.querySelector("span").textContent=v.s+(added?"  \u00b7 Added":"");
@@ -662,6 +670,7 @@ function applyQueueOpen(){
   else { list.classList.remove("open"); tg.innerHTML="Show &#9662;"; }
 }
 function inQueue(name){ for(var i=0;i<QUEUE.length;i++){ if(QUEUE[i].name===name) return true; } return false; }
+function inQueueIOS(fam,color,storage){ for(var i=0;i<QUEUE.length;i++){ var q=QUEUE[i]; if(q.isIOS&&q.family===fam&&q.color===color&&q.storage===storage) return true; } return false; }
 var imgCache={},imgCacheFam="";
 function staggerIn(el){ el.classList.remove("justopen"); void el.offsetWidth; el.classList.add("justopen"); }
 function renderQueue(){
