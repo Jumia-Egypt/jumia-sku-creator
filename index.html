@@ -305,7 +305,7 @@ var TREE={
 var path=[]; var fwdNav=false; // fwdNav=true only when drilling deeper
 var SUPABASE_URL="https://vxscfljgtmddnmzmwitq.supabase.co";
 var SUPABASE_KEY="sb_publishable_3Im_1dgtrjvTitchLnjIzA_Vu3RaDPw";
-var sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+var sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
 var PASS="admin123";
 var shopName="";
 var BRANDS=["Samsung","Xiaomi","Honor","Infinix","Oppo","Realme","Vivo","Motorola"];
