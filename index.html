@@ -438,7 +438,7 @@ function renderFamilyDetail(){
     var imgEl=imgCache[c.img];
     if(!imgEl){
       var im=fThumb(c.img);
-      imgEl=document.createElement("img");imgEl.loading="lazy";imgEl.decoding="async";imgEl.src=im;
+      imgEl=document.createElement("img");imgEl.decoding="async";imgEl.fetchPriority="high";imgEl.src=im;
       imgEl.onerror=function(){this.onerror=null;this.src=c.img;};
       imgCache[c.img]=imgEl;
     }
@@ -770,8 +770,18 @@ function loadiOSCatalog(){
     });
     Object.keys(IOS_ADATA).forEach(function(f){Object.keys(IOS_ADATA[f]).forEach(function(c){delete IOS_ADATA[f][c]._si;IOS_ADATA[f][c].variants.sort(function(a,b){return storageGB(a.s)-storageGB(b.s);});});});
     iosLoaded=true;
+    preloadIOSThumbs(data);
     if(path[0]==="Phones"&&path[1]==="iOS")render();
   },function(err){console.warn("iOS catalog request failed:",err);});
+}
+function preloadIOSThumbs(data){
+  var seen={};
+  data.forEach(function(r){
+    if(!r.image1||seen[r.image1])return;
+    seen[r.image1]=1;
+    var im=new Image();
+    im.src=fThumb(r.image1);
+  });
 }
 function fetchIOSDescription(variantId,cb){
   var url=SUPABASE_URL+"/rest/v1/master_data_ios?select=long_desc_en,highlights_en,long_desc_ar,highlights_ar&id=eq."+variantId;
