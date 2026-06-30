@@ -433,8 +433,10 @@ function renderFamilyDetail(){
   var d=$("famDetail");d.innerHTML="";
   var row=document.createElement("div");row.className="colorrow";
   if(brand==="Apple"&&window.innerWidth>600){
+    var colorCount=Object.keys(colors).length;
+    var perRow = (colorCount===4) ? 2 : 3;
     row.style.display="grid";
-    row.style.gridTemplateColumns="repeat(3,1fr)";
+    row.style.gridTemplateColumns="repeat("+perRow+",1fr)";
     row.style.gap="16px";
   }
   Object.keys(colors).forEach(function(col){
